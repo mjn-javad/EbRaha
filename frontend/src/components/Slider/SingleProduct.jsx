@@ -1,0 +1,434 @@
+import React, { useEffect, useState } from "react";
+import { Link, useParams } from "react-router-dom";
+
+import apiClientProducts from "../../services/api-client_products";
+import apiClientCart from "../../services/api-client_order";
+import apiClientAuth from "../../services/api-client_auth";
+
+import MessageAlert from "../Shared/MessageAlert";
+import LoadingSpinner from "../Shared/LoadingSpinner";
+import OrderOnWhatsApp from "../OrderOnWhatsApp/OrderOnWhatsApp";
+import ProductFinderBox from "../OrderOnWhatsApp/ProductFinderBox";
+
+const IMG_URL = "http://localhost:4000/images/posts/";
+
+const SingleProduct = () => {
+  const { id } = useParams();
+
+  const [product, setProduct] = useState(null);
+  const [colors, setColors] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  const [user, setUser] = useState(null);
+
+  const [selectedImage, setSelectedImage] = useState(0);
+  const [selectedSize, setSelectedSize] = useState("");
+  const [quantity, setQuantity] = useState(1);
+  const [addingToCart, setAddingToCart] = useState(false);
+  const [cartMessage, setCartMessage] = useState({ type: "", text: "" });
+  const [showSizeGuide, setShowSizeGuide] = useState(false);
+
+  const images = product?.images || [];
+  const sizes = (product?.sizes || []).filter((item) => item.quantity > 0);
+
+  const currentColor =
+    colors.find((item) => String(item.id || item._id) === String(id)) || null;
+
+  const getId = (item) => item?.id || item?._id;
+
+  const isAdmin = user?.role === "admin";
+  const getImageSrc = (image, size = 960) => {
+    if (!image) return "";
+
+    const imageName = typeof image === "string" ? image : image.image_name;
+
+    if (!imageName) return "";
+
+    // فقط تصاویر جدید دارای نسخه‌های 320، 640 و 960 هستند
+    const hasResponsiveVersions = /-(320|640|960)\.webp$/i.test(imageName);
+
+    // تصاویر قدیمی: مستقیماً خود فایل اصلی را نمایش بده
+    if (!hasResponsiveVersions) {
+      return `${IMG_URL}${imageName}`;
+    }
+
+    // تصاویر جدید: اندازه موردنظر را برگردان
+    const baseName = imageName
+      .replace(/\.[^/.]+$/, "")
+      .replace(/-(320|640|960)$/, "");
+
+    return `${IMG_URL}${baseName}-${size}.webp`;
+  };
+
+  useEffect(() => {
+    let active = true;
+
+    apiClientAuth
+      .get("/me")
+      .then((res) => {
+        const authUser = res.data?.user || res.data?.data || res.data;
+
+        if (active) {
+          setUser(authUser);
+        }
+      })
+      .catch(() => {
+        if (active) {
+          setUser(null);
+        }
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+
+    const fetchProduct = async () => {
+      setLoading(true);
+      setError("");
+      setSelectedImage(0);
+      setSelectedSize("");
+      setQuantity(1);
+      setCartMessage({ type: "", text: "" });
+
+      try {
+        const res = await apiClientProducts.get(`/${id}`);
+        if (active) setProduct(res.data.data);
+      } catch {
+        if (active) setError("There was a problem retrieving information");
+      } finally {
+        if (active) setLoading(false);
+      }
+    };
+
+    fetchProduct();
+
+    return () => {
+      active = false;
+    };
+  }, [id]);
+
+  useEffect(() => {
+    if (!product?.model) return;
+
+    let active = true;
+
+    const fetchColors = async () => {
+      try {
+        const res = await apiClientProducts.get(`/?model=${product.model}`);
+        if (active && res.data.success) setColors(res.data.data || []);
+      } catch (err) {
+        console.error("Error fetching colors:", err);
+      }
+    };
+
+    fetchColors();
+
+    return () => {
+      active = false;
+    };
+  }, [product?.model]);
+
+  const handleAddToCart = async () => {
+    if (!selectedSize) {
+      setCartMessage({ type: "error", text: "Please select a size" });
+      return;
+    }
+
+    setAddingToCart(true);
+    setCartMessage({ type: "", text: "" });
+
+    try {
+      const res = await apiClientCart.post("/cart", {
+        productsId: getId(product),
+        size: selectedSize,
+        quantity,
+        color: currentColor?.name || product?.color || null,
+      });
+
+      if (res.data.success) {
+        setCartMessage({
+          type: "success",
+          text: "Product successfully added to cart",
+        });
+
+        setTimeout(() => {
+          setCartMessage({ type: "", text: "" });
+        }, 3000);
+      }
+    } catch (err) {
+      setCartMessage({
+        type: "error",
+        text:
+          err.response?.data?.message ===
+          "Session expired. No refresh token provided."
+            ? "Please log in to your account"
+            : err.response?.data?.message || "An error occurred",
+      });
+    } finally {
+      setAddingToCart(false);
+    }
+  };
+
+  if (loading) return <LoadingSpinner />;
+  if (error) return <MessageAlert message={error} type="error" />;
+  if (!product)
+    return <div className="text-center py-10">Products not found</div>;
+
+  return (
+    <div className="product-detail container mx-auto my-0 p-4">
+      <ProductFinderBox />
+      <OrderOnWhatsApp
+        productName={product.name}
+        productPrice={product.discount_price || product.price}
+        productId={getId(product)}
+      />
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* Images */}
+        <div className="space-y-4">
+          <div className="border rounded-lg overflow-hidden bg-gray-100 h-[450px] flex items-center justify-center">
+            {images[selectedImage] ? (
+              <img
+                src={getImageSrc(images[selectedImage], 960)}
+                alt={product.name}
+                className="w-full h-full object-contain"
+              />
+            ) : (
+              <span className="text-gray-400">No image available</span>
+            )}
+          </div>
+
+          {images.length > 1 && (
+            <div className="grid grid-cols-4 gap-2">
+              {images.map((image, index) => (
+                <button
+                  key={index}
+                  onClick={() => setSelectedImage(index)}
+                  className={`border-2 rounded-lg overflow-hidden bg-gray-50 transition-all ${
+                    selectedImage === index
+                      ? "border-blue-500 shadow-lg ring-2 ring-blue-200"
+                      : "border-gray-200 hover:border-gray-400"
+                  }`}
+                >
+                  <img
+                    src={getImageSrc(image, 320)}
+                    alt={`${product.name} - ${index + 1}`}
+                    loading="lazy"
+                    className="w-full aspect-square object-cover"
+                  />
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Info */}
+        <div className="space-y-4">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h1 className="text-3xl font-bold">{product.name}</h1>
+              <p className="text-gray-600 text-lg">{product.brand}</p>
+            </div>
+
+            {isAdmin && (
+              <Link
+                to={`/admin/dashboard/editProduct/${getId(product)}`}
+                className="shrink-0 rounded-full border border-gray-300 px-4 py-2 text-xs font-medium uppercase tracking-widest text-gray-700 transition hover:bg-black hover:text-white"
+              >
+                Edit
+              </Link>
+            )}
+          </div>
+
+          <div>
+            {Number(product.price) === 1 ? (
+              <p className="text-2xl font-bold text-green-600">
+                Price on WhatsApp
+              </p>
+            ) : product.discount_price &&
+              Number(product.discount_price) !== Number(product.price) ? (
+              <>
+                <p className="text-2xl text-gray-500 line-through">
+                  {Number(product.price).toLocaleString()} AED
+                </p>
+
+                <p className="text-3xl font-bold text-green-600">
+                  {Number(product.discount_price).toLocaleString()} AED
+                </p>
+              </>
+            ) : (
+              <p className="text-3xl font-bold text-green-600">
+                {Number(product.price).toLocaleString()} AED
+              </p>
+            )}
+          </div>
+
+          <p className="text-gray-700 leading-relaxed">{product.description}</p>
+
+          {/* Colors */}
+          {colors.length > 0 && (
+            <div>
+              <h3 className="font-bold text-lg mb-3">Select Color</h3>
+
+              <div className="flex flex-wrap gap-3">
+                {colors.map((color) => {
+                  const colorId = getId(color);
+                  const isActive = String(colorId) === String(id);
+
+                  return (
+                    <Link
+                      key={colorId}
+                      to={`/product/${colorId}`}
+                      className={`w-14 h-14 p-1 rounded-lg border-2 transition-all ${
+                        isActive
+                          ? "border-blue-600 bg-blue-50 ring-2 ring-blue-200"
+                          : "border-gray-200 hover:border-blue-400 hover:bg-gray-50"
+                      }`}
+                    >
+                      <img
+                        src={getImageSrc(color?.images?.[0], 320)}
+                        alt={color.name}
+                        loading="lazy"
+                        className="w-full h-full object-cover rounded"
+                      />
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Sizes */}
+          {sizes.length > 0 && (
+            <div>
+              <div className="mb-3 flex items-center justify-between">
+                <h3 className="text-lg font-bold">Select Size (EU)</h3>
+
+                <button
+                  type="button"
+                  onClick={() => setShowSizeGuide((prev) => !prev)}
+                  className="text-sm font-medium text-blue-600 underline underline-offset-4"
+                >
+                  Size Guide
+                </button>
+              </div>
+
+              {showSizeGuide && product.type === "product" && (
+                <div className="mb-4 overflow-x-auto rounded-xl border border-neutral-200 bg-neutral-50 p-3">
+                  <table className="w-full min-w-[750px] text-center text-sm">
+                    <tbody>
+                      {[
+                        [
+                          "EU",
+                          Array.from({ length: 14 }, (_, index) => index + 35),
+                        ],
+                        [
+                          "UK",
+                          Array.from({ length: 14 }, (_, index) => index + 1),
+                        ],
+                        [
+                          "US",
+                          Array.from({ length: 14 }, (_, index) => index + 2),
+                        ],
+                      ].map(([system, values]) => (
+                        <tr key={system} className="border-b last:border-b-0">
+                          <th className="sticky left-0 bg-neutral-50 px-3 py-3 text-left font-bold">
+                            {system}
+                          </th>
+
+                          {values.map((size) => (
+                            <td key={size} className="px-3 py-3">
+                              {size}
+                            </td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+              <div className="flex flex-wrap gap-3">
+                {sizes.map((item) => (
+                  <button
+                    type="button"
+                    key={item.id || item.size}
+                    onClick={() => setSelectedSize(item.size)}
+                    className={`h-12 w-12 rounded-lg border-2 font-medium transition-all ${
+                      String(selectedSize) === String(item.size)
+                        ? "border-neutral-950 bg-neutral-950 text-white"
+                        : "border-neutral-300 text-neutral-800 hover:border-neutral-950 hover:bg-neutral-100"
+                    }`}
+                  >
+                    {item.size}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Quantity */}
+          {selectedSize && (
+            <div className="flex items-center gap-4 mb-4">
+              <label className="font-bold">Quantity:</label>
+
+              <div className="flex items-center border rounded-lg overflow-hidden">
+                <button
+                  onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
+                  disabled={quantity <= 1}
+                  className="w-10 h-10 text-xl font-bold bg-gray-50 hover:bg-gray-200 disabled:opacity-50"
+                >
+                  -
+                </button>
+
+                <input
+                  type="number"
+                  min="1"
+                  value={quantity}
+                  onChange={(e) =>
+                    setQuantity(Math.max(1, Number(e.target.value) || 1))
+                  }
+                  className="w-16 text-center py-2 focus:outline-none [appearance:textfield]"
+                />
+
+                <button
+                  onClick={() => setQuantity((prev) => prev + 1)}
+                  className="w-10 h-10 text-xl font-bold bg-gray-50 hover:bg-gray-200"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+          )}
+
+          {cartMessage.text && (
+            <MessageAlert message={cartMessage.text} type={cartMessage.type} />
+          )}
+
+          <button
+            onClick={handleAddToCart}
+            disabled={addingToCart || sizes.length === 0}
+            className={`w-full py-3 rounded-lg transition-all text-lg mt-6 ${
+              addingToCart || sizes.length === 0
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-neutral-950 hover:bg-neutral-600 text-white"
+            }`}
+          >
+            {addingToCart
+              ? "Adding..."
+              : sizes.length === 0
+                ? "Out of stock"
+                : "Add to basket"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default SingleProduct;
