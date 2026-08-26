@@ -89,8 +89,6 @@ const DiscountCodeManager = () => {
 
     try {
       setLoading(true);
-      console.log(code);
-
       const res = await apiClient.delete(`/removeSingleCode/${code}`);
 
       setMessage(res.data.message || "Code deleted successfully!");

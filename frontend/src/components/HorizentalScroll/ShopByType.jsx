@@ -23,8 +23,8 @@ const ShopByType = ({ navigatePath = "/slider-products" }) => {
   const isMale = gender === "male" || gender === "men";
   const categories = [
     [
-      "Poducts",
-      "poduct",
+      "Shoes",
+      "shoe",
       isMale ? ImgPoductMen : ImgPoductWomen,
       "Step into focus",
     ],

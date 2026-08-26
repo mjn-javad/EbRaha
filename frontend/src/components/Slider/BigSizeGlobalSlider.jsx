@@ -54,10 +54,6 @@ const NewArivelsGlobalSlider = ({
     const fetchBanner = async () => {
       try {
         const bannerRes = await apiClientBanner.get(`/${BigSizeBannerStOrd}`);
-
-        console.log("Banner request URL:", bannerRes.config?.url);
-        console.log("Banner response:", bannerRes.data);
-
         const bannerResult = bannerRes.data?.data || bannerRes.data;
 
         const selectedBanner = Array.isArray(bannerResult)
@@ -66,8 +62,6 @@ const NewArivelsGlobalSlider = ({
 
         if (isMounted) {
           setBanner(selectedBanner);
-
-          console.log("Banner image URL:", getImageUrl(selectedBanner?.image));
         }
       } catch (err) {
         console.error("Banner request error:", err);

@@ -74,7 +74,7 @@ const Footer = () => {
 
       <div className="boutique-footer__bottom">
         <p>© {new Date().getFullYear()} EbRahaStyle. All rights reserved.</p>
-        <p>Selected with intention. Delivered with care.</p>
+        <p>Made With ❤️ By Shairut</p>
       </div>
     </footer>
   );

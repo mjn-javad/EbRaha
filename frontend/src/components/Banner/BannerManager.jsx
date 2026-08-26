@@ -28,9 +28,7 @@ const BannerManager = () => {
 
   const getImageUrl = (image) => {
     if (!image) return "";
-    return image.startsWith("http")
-      ? image
-      : `/api/images/banners/${image}`;
+    return image.startsWith("http") ? image : `/api/images/banners/${image}`;
   };
 
   const getBanners = () => {
@@ -49,8 +47,6 @@ const BannerManager = () => {
         }
       })
       .catch((err) => {
-        console.log("Get banners error:", err);
-
         if (isMounted) {
           setError("an error acuured while fetching banners");
         }
@@ -100,7 +96,6 @@ const BannerManager = () => {
 
       setMessage("Banner deleted successfully");
     } catch (err) {
-      console.log("Delete banner error:", err);
       setError("Error deleteing banner");
     } finally {
       setDeletingId(null);

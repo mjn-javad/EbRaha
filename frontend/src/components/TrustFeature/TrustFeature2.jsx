@@ -3,14 +3,26 @@ import { BadgeCheck, Headphones, PackageCheck, ScanSearch } from "lucide-react";
 
 const services = [
   [BadgeCheck, "Curated selection", "Designer pieces chosen with a sharp eye."],
-  [PackageCheck, "Considered delivery", "Carefully packed and delivered across the UAE."],
-  [ScanSearch, "Private sourcing", "Send us a reference and we will source it for you."],
-  [Headphones, "Human support", "Real assistance before and after your purchase."],
+  [
+    PackageCheck,
+    "Considered delivery",
+    "Carefully packed and delivered across the UAE.",
+  ],
+  [
+    ScanSearch,
+    "Private sourcing",
+    "Send us a reference and we will source it for you.",
+  ],
+  [
+    Headphones,
+    "Human support",
+    "Real assistance before and after your purchase.",
+  ],
 ];
 
 const TrustFeature2 = () => (
   <section className="service-editorial">
-    <div className="service-editorial__heading">
+    <div className="service-editorial__heading text-center">
       <p>The EbRaha standard</p>
       <h2>Luxury is in the way it feels.</h2>
     </div>
