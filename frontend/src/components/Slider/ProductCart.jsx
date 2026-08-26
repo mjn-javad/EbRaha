@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 
-const IMAGE_ROOT = "http://localhost:4000/images/posts/";
+const IMAGE_ROOT = "/api/images/posts/";
 
 const getProductImage = (product, index = 0, size = 640) => {
   const imageName = product?.images?.[index]?.image_name;
@@ -34,11 +34,11 @@ const ProductCard = ({
   products: initialProducts,
   header = "The collection",
   title = "Explore all pieces",
-  navigateLink = "/slider-products",
+  navigateLink,
   scrollOnMobile = false,
   scrollOnLaptop = false,
   infiniteScroll = true,
-  apiUrl = "http://localhost:4000/v1/products",
+  apiUrl = "/api/v1/products",
   limit = 20,
 }) => {
   const [searchParams] = useSearchParams();
@@ -132,9 +132,11 @@ const ProductCard = ({
               </button>
             </div>
           )}
-          <Link to={navigateLink || "/slider-products"}>
-            View the edit <ArrowRight size={16} />
-          </Link>
+          {navigateLink && (
+            <Link to={navigateLink}>
+              View the edit <ArrowRight size={16} />
+            </Link>
+          )}
         </div>
       </div>
 

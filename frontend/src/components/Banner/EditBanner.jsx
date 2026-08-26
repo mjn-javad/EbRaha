@@ -37,9 +37,7 @@ const EditBanner = () => {
   const getImageUrl = (image) => {
     if (!image) return "";
 
-    return image.startsWith("http")
-      ? image
-      : `http://localhost:4000/images/banners/${image}`;
+    return image.startsWith("http") ? image : `/api/images/banners/${image}`;
   };
 
   const fillForm = (banner) => {

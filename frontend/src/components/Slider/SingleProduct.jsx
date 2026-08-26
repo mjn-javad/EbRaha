@@ -10,7 +10,7 @@ import LoadingSpinner from "../Shared/LoadingSpinner";
 import OrderOnWhatsApp from "../OrderOnWhatsApp/OrderOnWhatsApp";
 import ProductFinderBox from "../OrderOnWhatsApp/ProductFinderBox";
 
-const IMG_URL = "http://localhost:4000/images/posts/";
+const IMG_URL = "/api/images/posts/";
 
 const SingleProduct = () => {
   const { id } = useParams();
@@ -318,7 +318,7 @@ const SingleProduct = () => {
                 </button>
               </div>
 
-              {showSizeGuide && product.type === "product" && (
+              {showSizeGuide && product.type === "shoe" && (
                 <div className="mb-4 overflow-x-auto rounded-xl border border-neutral-200 bg-neutral-50 p-3">
                   <table className="w-full min-w-[750px] text-center text-sm">
                     <tbody>

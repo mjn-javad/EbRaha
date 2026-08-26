@@ -108,7 +108,7 @@ const findById = async (id) => {
   );
 
   const [sizes] = await db.execute(
-    "SELECT * FROM products_stock WHERE products_id = ?",
+    "SELECT stock as size, quantity FROM products_stock WHERE products_id = ?",
     [id],
   );
 

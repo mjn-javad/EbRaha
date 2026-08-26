@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import apiClientBanner from "../../services/api-client_banner";
 
-const IMAGE_BASE_URL = "http://localhost:4000/images/banners/";
+const IMAGE_BASE_URL = "/api/images/banners/";
 
 const getImageUrl = (image) => {
   if (!image) return "";
@@ -274,15 +274,11 @@ const GlobalBanner = ({ mobileSortOrder, laptopSortOrder }) => {
             `}
           >
             {currentBanner.title1 && (
-              <h1>
-                {currentBanner.title1.replace(/\\n/g, "\n")}
-              </h1>
+              <h1>{currentBanner.title1.replace(/\\n/g, "\n")}</h1>
             )}
 
             {currentBanner.title2 && (
-              <p>
-                {currentBanner.title2.replace(/\\n/g, "\n")}
-              </p>
+              <p>{currentBanner.title2.replace(/\\n/g, "\n")}</p>
             )}
 
             {hasButtons && (

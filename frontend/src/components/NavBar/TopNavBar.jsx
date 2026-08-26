@@ -281,7 +281,7 @@ export default function TopNavbar({ handelOrderPopup }) {
               ),
             )}
             {user?.role === "admin" && (
-              <Link to="/admin/dashboard">Administration</Link>
+              <Link to="/admin/dashboard/product-upload">Administration</Link>
             )}
           </nav>
 

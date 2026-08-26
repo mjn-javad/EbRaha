@@ -24,17 +24,22 @@ const BestSellersBanner = ({ gender = "female" }) => {
   }, [sortOrder]);
 
   if (loading) {
-    return <div className="bestseller-editorial bestseller-editorial--loading" />;
+    return (
+      <div className="bestseller-editorial bestseller-editorial--loading" />
+    );
   }
   if (!banner) return null;
 
   const imageUrl = banner.image?.startsWith("http")
     ? banner.image
-    : `http://localhost:4000/images/banners/${banner.image}`;
+    : `/api/images/banners/${banner.image}`;
 
   return (
     <section className="bestseller-editorial">
-      <Link to={`/bestSellers?gender=${gender}`} className="bestseller-editorial__media">
+      <Link
+        to={`/bestSellers?gender=${gender}`}
+        className="bestseller-editorial__media"
+      >
         <img src={imageUrl} alt="EbRahaStyle best sellers" />
         <span>Most desired</span>
       </Link>
@@ -42,8 +47,8 @@ const BestSellersBanner = ({ gender = "female" }) => {
         <p>EbRaha favourites / 02</p>
         <h2>The pieces everyone is talking about.</h2>
         <span>
-          Tried, loved and returned to—the season’s most wanted signatures,
-          all in one considered edit.
+          Tried, loved and returned to—the season’s most wanted signatures, all
+          in one considered edit.
         </span>
         <Link to={`/bestSellers?gender=${gender}`}>
           Discover best sellers <ArrowUpRight size={18} />

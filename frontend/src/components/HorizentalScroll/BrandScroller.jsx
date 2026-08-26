@@ -70,10 +70,10 @@ const BrandScroller = ({
   if (!brands.length && !error) return null;
 
   return (
-    <section className="brand-edit">
+    <section className="brand-edit product-showcase">
       <div className="brand-edit__head">
         <div>
-          <p>Designer index</p>
+          <p>EbRaha Style</p>
           <h2>House names & new discoveries</h2>
         </div>
         <div>

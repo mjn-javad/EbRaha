@@ -7,7 +7,7 @@ export interface Brand {
 }
 
 const apiClientBrand = axios.create({
-  baseURL: "http://localhost:4000/v1/products",
+  baseURL: "/api/v1/products",
   withCredentials: true, // ✅ مهم: این گزینه باعث ارسال خودکار کوکی‌ها میشه
 });
 

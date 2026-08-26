@@ -3,7 +3,7 @@ import apiClientBrandPopular from "../../services/api-client";
 import apiClientBanner from "../../services/api-client_banner";
 import ProductCard from "./ProductCart";
 
-const IMAGE_BASE_URL = "http://localhost:4000/images/banners/";
+const IMAGE_BASE_URL = "/api/images/banners/";
 
 const getImageUrl = (image) => {
   if (!image) return "";
@@ -116,7 +116,7 @@ const NewArivelsGlobalSlider = ({
         header={header}
         title={title}
         navigateLink={navigateLink}
-        apiUrl={`http://localhost:4000/v1/brandPopular/newArrivels${myQuery}`}
+        apiUrl={`/api/v1/brandPopular/newArrivels${myQuery}`}
         limit={limit}
         infiniteScroll={false}
         scrollOnMobile={true}

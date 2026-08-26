@@ -30,7 +30,7 @@ const BannerManager = () => {
     if (!image) return "";
     return image.startsWith("http")
       ? image
-      : `http://localhost:4000/images/banners/${image}`;
+      : `/api/images/banners/${image}`;
   };
 
   const getBanners = () => {

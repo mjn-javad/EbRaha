@@ -1,7 +1,7 @@
 import React from "react";
 import InputField from "../Shared/InputField";
 
-const ProductInfoForm = ({ shoeInfo, onChange, onUpdate, updating }) => {
+const ProductInfoForm = ({ productInfo, onChange, onUpdate, updating }) => {
   return (
     <div className="bg-white rounded-lg shadow p-6">
       <h2 className="text-xl font-bold mb-4 text-gray-800">
@@ -12,7 +12,7 @@ const ProductInfoForm = ({ shoeInfo, onChange, onUpdate, updating }) => {
         <InputField
           name="name"
           label="Product Name"
-          value={shoeInfo.name}
+          value={productInfo.name}
           onChange={onChange}
           required={true}
         />
@@ -20,7 +20,7 @@ const ProductInfoForm = ({ shoeInfo, onChange, onUpdate, updating }) => {
         <InputField
           name="slug"
           label="Slug"
-          value={shoeInfo.slug}
+          value={productInfo.slug}
           onChange={onChange}
           required={true}
         />
@@ -28,22 +28,21 @@ const ProductInfoForm = ({ shoeInfo, onChange, onUpdate, updating }) => {
         <InputField
           name="brand"
           label="Brand"
-          value={shoeInfo.brand}
+          value={productInfo.brand}
           onChange={onChange}
           required={true}
-          disabled={true}
-          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-400 bg-gray-100 cursor-not-allowed"
+          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-400 bg-gray-100"
         />
 
         <InputField
           name="model"
           label="Model"
-          value={shoeInfo.model}
+          value={productInfo.model}
           onChange={onChange}
           required={true}
         />
 
-        {shoeInfo.type === "shoe" && (
+        {productInfo.type === "shoe" && (
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Category
@@ -51,7 +50,7 @@ const ProductInfoForm = ({ shoeInfo, onChange, onUpdate, updating }) => {
 
             <select
               name="category"
-              value={shoeInfo.category}
+              value={productInfo.category}
               onChange={onChange}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
@@ -75,7 +74,7 @@ const ProductInfoForm = ({ shoeInfo, onChange, onUpdate, updating }) => {
 
           <select
             name="gender"
-            value={shoeInfo.gender}
+            value={productInfo.gender}
             onChange={onChange}
             required
             className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -93,7 +92,7 @@ const ProductInfoForm = ({ shoeInfo, onChange, onUpdate, updating }) => {
 
           <select
             name="type"
-            value={shoeInfo.type}
+            value={productInfo.type}
             onChange={onChange}
             required
             className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -110,7 +109,7 @@ const ProductInfoForm = ({ shoeInfo, onChange, onUpdate, updating }) => {
         <InputField
           name="colors"
           label="Colors"
-          value={shoeInfo.colors}
+          value={productInfo.colors}
           onChange={onChange}
           placeholder="مثلاً مشکی، سفید، قهوه‌ای"
         />
@@ -118,7 +117,7 @@ const ProductInfoForm = ({ shoeInfo, onChange, onUpdate, updating }) => {
         <InputField
           name="price"
           label="Price"
-          value={shoeInfo.price}
+          value={productInfo.price}
           onChange={onChange}
           required={true}
         />
@@ -126,7 +125,7 @@ const ProductInfoForm = ({ shoeInfo, onChange, onUpdate, updating }) => {
         <InputField
           name="discountPrice"
           label="Discount Price"
-          value={shoeInfo.discountPrice}
+          value={productInfo.discountPrice}
           onChange={onChange}
           required={false}
         />
@@ -134,7 +133,7 @@ const ProductInfoForm = ({ shoeInfo, onChange, onUpdate, updating }) => {
         <InputField
           name="description"
           label="Description"
-          value={shoeInfo.description}
+          value={productInfo.description}
           onChange={onChange}
         />
 

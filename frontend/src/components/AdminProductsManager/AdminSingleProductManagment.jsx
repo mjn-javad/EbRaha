@@ -65,7 +65,7 @@ const AdminSingleProductManagement = () => {
 
       let sizesArray = [];
 
-      if (product.sizes && Array.isArray(product.sizes)) {
+      if (product.sizes) {
         sizesArray = product.sizes.map((item) => ({
           size: item.size,
           quantity: item.quantity,

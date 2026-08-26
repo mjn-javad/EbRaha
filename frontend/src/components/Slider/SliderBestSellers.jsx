@@ -36,7 +36,7 @@ const SliderBestSellers = ({ header, title, navigateLink, limit }) => {
         title={title}
         navigateLink={navigateLink}
         scrollOnMobile={limit !== undefined}
-        apiUrl="http://localhost:4000/v1/products"
+        apiUrl="/api/v1/products"
         limit={limit}
       />
     </div>
