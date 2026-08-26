@@ -3,10 +3,8 @@ const { Resend } = require("resend");
 
 class EmailService {
   constructor() {
-    this.brandName = process.env.BRAND_NAME || "EbRahaStyle";
-    this.senderEmail = process.env.RESEND_FROM_EMAIL;
-    this.sender = `${this.brandName} <${this.senderEmail}>`;
     this.resend = new Resend(process.env.RESEND_API_KEY);
+    this.from = "EbRahaStyle <no-reply@ebrahastyle.com>";
   }
 
   async sendEmail(mailOption) {

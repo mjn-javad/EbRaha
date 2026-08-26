@@ -134,10 +134,6 @@ export default function TopNavbar({ handelOrderPopup }) {
     <>
       <div className="announcement-bar">
         <span>Complimentary UAE delivery on selected orders</span>
-
-        <span className="announcement-bar__edition">
-          The EbRaha edit · 2026
-        </span>
       </div>
 
       <header className="boutique-header">
