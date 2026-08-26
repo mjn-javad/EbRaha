@@ -1,0 +1,86 @@
+@media (max-width: 900px) {
+  .boutique-actions {
+    display: flex !important;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 9px;
+  }
+
+  /* ترتیب: W/M سپس حساب سپس سبد خرید */
+  .boutique-actions .gender-switch {
+    display: flex !important;
+    align-items: center;
+    order: 1;
+  }
+
+  .boutique-actions .account-control {
+    display: block !important;
+    position: relative;
+    order: 2;
+  }
+
+  .boutique-actions .basket-link {
+    display: flex !important;
+    align-items: center;
+    order: 3;
+  }
+
+  .boutique-actions .basket-link span {
+    display: none;
+  }
+
+  .account-control > button,
+  .account-control > a {
+    display: grid;
+    place-items: center;
+    padding: 5px;
+    border: 0;
+    background: transparent;
+    color: #17130f;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .account-control .account-menu {
+    position: absolute;
+    top: calc(100% + 16px);
+    right: -42px;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    width: 230px;
+    padding: 16px;
+    background: #ffffff;
+    border: 1px solid #e7e0d7;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.16);
+  }
+
+  .account-control .account-menu p {
+    margin: 0 0 5px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .account-control .account-menu span {
+    margin-bottom: 12px;
+    color: #71685f;
+    font-size: 12px;
+    overflow-wrap: anywhere;
+  }
+
+  .account-control .account-menu a,
+  .account-control .account-menu button {
+    display: block;
+    width: 100%;
+    padding: 11px 0;
+    border: 0;
+    border-bottom: 1px solid #ece6de;
+    background: transparent;
+    color: #17130f;
+    font: inherit;
+    font-size: 13px;
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+  }
+}
