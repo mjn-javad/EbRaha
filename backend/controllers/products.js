@@ -1,4 +1,4 @@
-const ProductRepository = require("../repositories/Products");
+const ProductRepository = require("../repositories/products");
 const BrandPopular = require("../repositories/brandPopular");
 const fs = require("fs").promises;
 const path = require("path");
