@@ -1,6 +1,6 @@
 const db = require("../db");
 const Order = require("../repositories/order");
-const Product = require("../repositories/Products");
+const Product = require("../repositories/products");
 const User = require("../repositories/users");
 const Address = require("../repositories/address");
 const emailService = require("../services/emailService");
