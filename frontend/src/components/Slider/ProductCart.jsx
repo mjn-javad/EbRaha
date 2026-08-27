@@ -14,19 +14,12 @@ const getProductImage = (product, index = 0, size = 640) => {
 
   if (!imageName) return "";
 
-  // فقط تصاویر جدید دارای نسخه‌های 320، 640 و 960 هستند
-  const hasResponsiveVersions = /-(320|640|960)\.webp$/i.test(imageName);
-
-  // تصاویر قدیمی: همان فایل اصلی
-  if (!hasResponsiveVersions) {
-    return `${IMAGE_ROOT}${imageName}`;
-  }
-
-  // تصاویر جدید: سایز موردنظر
+  // حذف پسوند اصلی و اندازه قبلی
   const baseName = imageName
     .replace(/\.[^/.]+$/, "")
-    .replace(/-(320|640|960)$/, "");
+    .replace(/-(320|640|960)$/i, "");
 
+  // نمایش نسخه WebP با اندازه موردنظر
   return `${IMAGE_ROOT}${baseName}-${size}.webp`;
 };
 

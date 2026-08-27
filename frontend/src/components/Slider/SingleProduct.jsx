@@ -45,19 +45,12 @@ const SingleProduct = () => {
 
     if (!imageName) return "";
 
-    // فقط تصاویر جدید دارای نسخه‌های 320، 640 و 960 هستند
-    const hasResponsiveVersions = /-(320|640|960)\.webp$/i.test(imageName);
-
-    // تصاویر قدیمی: مستقیماً خود فایل اصلی را نمایش بده
-    if (!hasResponsiveVersions) {
-      return `${IMG_URL}${imageName}`;
-    }
-
-    // تصاویر جدید: اندازه موردنظر را برگردان
+    // حذف پسوند اصلی و اندازه قبلی عکس
     const baseName = imageName
       .replace(/\.[^/.]+$/, "")
-      .replace(/-(320|640|960)$/, "");
+      .replace(/-(320|640|960)$/i, "");
 
+    // نمایش نسخه WebP با اندازه موردنظر
     return `${IMG_URL}${baseName}-${size}.webp`;
   };
 
