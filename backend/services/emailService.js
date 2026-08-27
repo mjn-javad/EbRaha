@@ -3,8 +3,11 @@ const { Resend } = require("resend");
 
 class EmailService {
   constructor() {
+    this.brandName = "EbRahaStyle";
+    this.senderEmail = "no-reply@ebrahastyle.com";
+    this.sender = `${this.brandName} <${this.senderEmail}>`;
+
     this.resend = new Resend(process.env.RESEND_API_KEY);
-    this.from = "EbRahaStyle <no-reply@ebrahastyle.com>";
   }
 
   async sendEmail(mailOption) {
@@ -55,18 +58,21 @@ class EmailService {
     };
 
     try {
-      await this.sendEmail(mailOption);
+      const data = await this.sendEmail(mailOption);
+
+      console.log("Verification email sent:", data);
 
       return {
         success: true,
         message: "Email sent successfully",
+        data,
       };
     } catch (error) {
       console.error("Email sending error:", error);
 
       return {
         success: false,
-        message: "Failed to send email",
+        message: error?.message || "Failed to send email",
       };
     }
   }
@@ -125,7 +131,7 @@ class EmailService {
             and your password will remain unchanged.
           </p>
 
-          <hr style="margin:20px 0;" />
+          <hr style="margin:20px 0;">
 
           <p style="color:#888;font-size:12px;">
             For security, never share this link with anyone.
@@ -135,45 +141,56 @@ class EmailService {
     };
 
     try {
-      await this.sendEmail(mailOption);
+      const data = await this.sendEmail(mailOption);
+
+      console.log("Password reset email sent:", data);
 
       return {
         success: true,
         message: "Password reset email sent successfully",
+        data,
       };
     } catch (error) {
       console.error("Password reset email error:", error);
 
       return {
         success: false,
-        message: "Failed to send reset email",
+        message: error?.message || "Failed to send reset email",
       };
     }
   }
 
-  // ارسال ایمیل تأیید سفارش به مشتری
   async sendOrderConfirmationEmail(orderDetails) {
     const {
       customerEmail,
       customerName,
       orderId,
       orderDate,
-      items,
+      items = [],
       totalAmount,
-      shippingAddress,
+      shippingAddress = {},
       paymentMethod,
     } = orderDetails;
 
     const itemsList = items
-      .map(
-        (item) => `
+      .map((item) => {
+        const price = Number(item.price) || 0;
+
+        const discountPrice =
+          item.discount_price !== null && item.discount_price !== undefined
+            ? Number(item.discount_price)
+            : price;
+
+        const quantity = Number(item.quantity) || 1;
+
+        return `
           <tr style="border-bottom:1px solid #eee;">
             <td style="padding:10px;text-align:left;">
-              ${item.name}
+              ${item.name || "-"}
             </td>
 
             <td style="padding:10px;text-align:center;">
-              ${item.quantity}
+              ${quantity}
             </td>
 
             <td style="padding:10px;text-align:center;">
@@ -181,19 +198,19 @@ class EmailService {
             </td>
 
             <td style="padding:10px;text-align:right;text-decoration:line-through;">
-              $${item.price.toFixed(2)}
+              ${price.toFixed(2)} AED
             </td>
 
             <td style="padding:10px;text-align:right;">
-              $${item.discount_price.toFixed(2)}
+              ${discountPrice.toFixed(2)} AED
             </td>
 
             <td style="padding:10px;text-align:right;">
-              $${(item.discount_price * item.quantity).toFixed(2)}
+              ${(discountPrice * quantity).toFixed(2)} AED
             </td>
           </tr>
-        `,
-      )
+        `;
+      })
       .join("");
 
     const mailOption = {
@@ -212,7 +229,7 @@ class EmailService {
             </h1>
 
             <p style="color:#625b56;">
-              Thank you for choosing our edit.
+              Thank you for choosing our collection.
             </p>
           </div>
 
@@ -222,7 +239,7 @@ class EmailService {
             </h2>
 
             <p>
-              Dear <strong>${customerName}</strong>,
+              Dear <strong>${customerName || "Customer"}</strong>,
             </p>
 
             <p>
@@ -235,21 +252,19 @@ class EmailService {
               </p>
 
               <p style="margin:5px 0;">
-                <strong>Order Date:</strong> ${orderDate}
+                <strong>Order Date:</strong> ${orderDate || "-"}
               </p>
 
               <p style="margin:5px 0;">
-                <strong>Payment Method:</strong> ${paymentMethod}
+                <strong>Payment Method:</strong> ${paymentMethod || "-"}
               </p>
             </div>
           </div>
 
-          <div style="background:white;padding:20px;border-radius:8px;margin-bottom:20px;">
-            <h3 style="margin-top:0;">
-              Order Summary
-            </h3>
+          <div style="background:white;padding:20px;border-radius:8px;margin-bottom:20px;overflow-x:auto;">
+            <h3 style="margin-top:0;">Order Summary</h3>
 
-            <table style="width:100%;border-collapse:collapse;">
+            <table style="width:100%;border-collapse:collapse;min-width:650px;">
               <thead>
                 <tr>
                   <th style="text-align:left;padding:10px;background:#f5f5f5;">
@@ -265,11 +280,11 @@ class EmailService {
                   </th>
 
                   <th style="text-align:right;padding:10px;background:#f5f5f5;">
-                    Price Without Discount
+                    Original Price
                   </th>
 
                   <th style="text-align:right;padding:10px;background:#f5f5f5;">
-                    Price With Discount
+                    Price
                   </th>
 
                   <th style="text-align:right;padding:10px;background:#f5f5f5;">
@@ -292,7 +307,7 @@ class EmailService {
                   </td>
 
                   <td style="padding:10px;text-align:right;font-weight:bold;color:#4CAF50;">
-                    $${totalAmount.toFixed(2)}
+                    ${(Number(totalAmount) || 0).toFixed(2)} AED
                   </td>
                 </tr>
               </tfoot>
@@ -300,28 +315,27 @@ class EmailService {
           </div>
 
           <div style="background:white;padding:20px;border-radius:8px;margin-bottom:20px;">
-            <h3 style="margin-top:0;">
-              Shipping Address
-            </h3>
+            <h3 style="margin-top:0;">Shipping Address</h3>
 
             <p style="margin:5px 0;">
-              ${shippingAddress.full_name}
+              ${shippingAddress.full_name || "-"}
             </p>
 
             <p style="margin:5px 0;">
-              ${shippingAddress.phone}
+              ${shippingAddress.phone || "-"}
             </p>
 
             <p style="margin:5px 0;">
-              ${shippingAddress.address}
+              ${shippingAddress.address || "-"}
             </p>
 
             <p style="margin:5px 0;">
-              ${shippingAddress.city}, ${shippingAddress.province}
+              ${shippingAddress.city || "-"},
+              ${shippingAddress.province || "-"}
             </p>
 
             <p style="margin:5px 0;">
-              Postal Code: ${shippingAddress.postal_code}
+              Postal Code: ${shippingAddress.postal_code || "-"}
             </p>
           </div>
 
@@ -331,7 +345,7 @@ class EmailService {
             </p>
           </div>
 
-          <hr style="margin:20px 0;" />
+          <hr style="margin:20px 0;">
 
           <p style="color:#888;font-size:12px;text-align:center;">
             Need help? Reply to this email and our client-care team will assist you.
@@ -343,45 +357,56 @@ class EmailService {
     };
 
     try {
-      await this.sendEmail(mailOption);
+      const data = await this.sendEmail(mailOption);
+
+      console.log("Order confirmation email sent:", data);
 
       return {
         success: true,
         message: "Order confirmation email sent to customer",
+        data,
       };
     } catch (error) {
       console.error("Order confirmation email error:", error);
 
       return {
         success: false,
-        message: "Failed to send order confirmation",
+        message: error?.message || "Failed to send order confirmation",
       };
     }
   }
 
-  // ارسال ایمیل سفارش جدید به ادمین
   async sendNewOrderNotificationToWorker(orderDetails) {
     const {
       customerName,
       customerEmail,
       orderId,
       orderDate,
-      items,
+      items = [],
       totalAmount,
-      shippingAddress,
+      shippingAddress = {},
       paymentMethod,
     } = orderDetails;
 
     const itemsList = items
-      .map(
-        (item) => `
+      .map((item) => {
+        const price = Number(item.price) || 0;
+
+        const discountPrice =
+          item.discount_price !== null && item.discount_price !== undefined
+            ? Number(item.discount_price)
+            : price;
+
+        const quantity = Number(item.quantity) || 1;
+
+        return `
           <tr style="border-bottom:1px solid #eee;">
             <td style="padding:10px;text-align:left;">
-              ${item.name}
+              ${item.name || "-"}
             </td>
 
             <td style="padding:10px;text-align:center;">
-              ${item.quantity}
+              ${quantity}
             </td>
 
             <td style="padding:10px;text-align:center;">
@@ -389,24 +414,26 @@ class EmailService {
             </td>
 
             <td style="padding:10px;text-align:right;text-decoration:line-through;">
-              $${item.price.toFixed(2)}
+              ${price.toFixed(2)} AED
             </td>
 
             <td style="padding:10px;text-align:right;">
-              $${item.discount_price.toFixed(2)}
+              ${discountPrice.toFixed(2)} AED
             </td>
 
             <td style="padding:10px;text-align:right;">
-              $${(item.discount_price * item.quantity).toFixed(2)}
+              ${(discountPrice * quantity).toFixed(2)} AED
             </td>
           </tr>
-        `,
-      )
+        `;
+      })
       .join("");
+
+    const adminEmail = process.env.ADMIN_EMAIL || this.senderEmail;
 
     const mailOption = {
       from: this.sender,
-      to: process.env.ADMIN_EMAIL || this.senderEmail,
+      to: adminEmail,
       subject: `${this.brandName} admin — New order #${orderId}`,
       html: `
         <div style="font-family:Arial,sans-serif;max-width:800px;margin:0 auto;background:#eee8df;padding:24px;color:#1a1614;">
@@ -430,32 +457,35 @@ class EmailService {
             </h2>
 
             <p>
-              <strong>Customer Name:</strong> ${customerName}
+              <strong>Customer Name:</strong>
+              ${customerName || "-"}
             </p>
 
             <p>
-              <strong>Customer Email:</strong> ${customerEmail}
+              <strong>Customer Email:</strong>
+              ${customerEmail || "-"}
             </p>
 
             <p>
-              <strong>Order Number:</strong> #${orderId}
+              <strong>Order Number:</strong>
+              #${orderId}
             </p>
 
             <p>
-              <strong>Order Date:</strong> ${orderDate}
+              <strong>Order Date:</strong>
+              ${orderDate || "-"}
             </p>
 
             <p>
-              <strong>Payment Method:</strong> ${paymentMethod}
+              <strong>Payment Method:</strong>
+              ${paymentMethod || "-"}
             </p>
           </div>
 
-          <div style="background:white;padding:20px;border-radius:8px;margin-bottom:20px;">
-            <h3 style="margin-top:0;">
-              Order Items
-            </h3>
+          <div style="background:white;padding:20px;border-radius:8px;margin-bottom:20px;overflow-x:auto;">
+            <h3 style="margin-top:0;">Order Items</h3>
 
-            <table style="width:100%;border-collapse:collapse;">
+            <table style="width:100%;border-collapse:collapse;min-width:650px;">
               <thead>
                 <tr style="background:#5a2135;color:white;">
                   <th style="text-align:left;padding:10px;">
@@ -471,11 +501,11 @@ class EmailService {
                   </th>
 
                   <th style="text-align:right;padding:10px;">
-                    Price Without Discount
+                    Original Price
                   </th>
 
                   <th style="text-align:right;padding:10px;">
-                    Price With Discount
+                    Price
                   </th>
 
                   <th style="text-align:right;padding:10px;">
@@ -498,7 +528,7 @@ class EmailService {
                   </td>
 
                   <td style="padding:10px;text-align:right;font-weight:bold;color:#ff9800;font-size:18px;">
-                    $${totalAmount.toFixed(2)}
+                    ${(Number(totalAmount) || 0).toFixed(2)} AED
                   </td>
                 </tr>
               </tfoot>
@@ -506,33 +536,32 @@ class EmailService {
           </div>
 
           <div style="background:white;padding:20px;border-radius:8px;margin-bottom:20px;">
-            <h3 style="margin-top:0;">
-              Shipping Address
-            </h3>
+            <h3 style="margin-top:0;">Shipping Address</h3>
 
             <p style="margin:5px 0;">
               <strong>Recipient:</strong>
-              ${shippingAddress.full_name}
+              ${shippingAddress.full_name || "-"}
             </p>
 
             <p style="margin:5px 0;">
               <strong>Phone:</strong>
-              ${shippingAddress.phone}
+              ${shippingAddress.phone || "-"}
             </p>
 
             <p style="margin:5px 0;">
               <strong>Address:</strong>
-              ${shippingAddress.address}
+              ${shippingAddress.address || "-"}
             </p>
 
             <p style="margin:5px 0;">
               <strong>City:</strong>
-              ${shippingAddress.city}, ${shippingAddress.province}
+              ${shippingAddress.city || "-"},
+              ${shippingAddress.province || "-"}
             </p>
 
             <p style="margin:5px 0;">
               <strong>Postal Code:</strong>
-              ${shippingAddress.postal_code}
+              ${shippingAddress.postal_code || "-"}
             </p>
           </div>
 
@@ -547,7 +576,7 @@ class EmailService {
             </p>
           </div>
 
-          <hr style="margin:20px 0;" />
+          <hr style="margin:20px 0;">
 
           <p style="color:#888;font-size:12px;text-align:center;">
             This is an automated notification from ${this.brandName}.
@@ -559,30 +588,31 @@ class EmailService {
     };
 
     try {
-      await this.sendEmail(mailOption);
+      const data = await this.sendEmail(mailOption);
+
+      console.log("Order notification sent to admin:", data);
 
       return {
         success: true,
-        message: "Order notification sent to worker",
+        message: "Order notification sent to admin",
+        data,
       };
     } catch (error) {
-      console.error("Worker notification email error:", error);
+      console.error("Admin notification email error:", error);
 
       return {
         success: false,
-        message: "Failed to send worker notification",
+        message: error?.message || "Failed to send admin notification",
       };
     }
   }
 
-  // ارسال ایمیل به مشتری و ادمین
   async sendOrderNotifications(orderDetails) {
     try {
-      const customerResult =
-        await this.sendOrderConfirmationEmail(orderDetails);
-
-      const workerResult =
-        await this.sendNewOrderNotificationToWorker(orderDetails);
+      const [customerResult, workerResult] = await Promise.all([
+        this.sendOrderConfirmationEmail(orderDetails),
+        this.sendNewOrderNotificationToWorker(orderDetails),
+      ]);
 
       return {
         success: customerResult.success && workerResult.success,
