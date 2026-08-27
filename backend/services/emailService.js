@@ -1,20 +1,79 @@
 // services/email.service.js
 const { Resend } = require("resend");
 
+const BRAND_NAME = "EbRahaStyle";
+const SENDER_EMAIL = "no-reply@ebrahastyle.com";
+const SENDER = `${BRAND_NAME} <${SENDER_EMAIL}>`;
+
+const isValidEmail = (email) =>
+  typeof email === "string" && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+
+const toNumber = (value, fallback = 0) => {
+  const number = Number(value);
+
+  return Number.isFinite(number) ? number : fallback;
+};
+
 class EmailService {
   constructor() {
-    this.brandName = "EbRahaStyle";
-    this.senderEmail = "no-reply@ebrahastyle.com";
-    this.sender = `${this.brandName} <${this.senderEmail}>`;
+    const apiKey = process.env.RESEND_API_KEY?.trim();
 
-    this.resend = new Resend(process.env.RESEND_API_KEY);
+    if (!apiKey) {
+      throw new Error(
+        "RESEND_API_KEY is missing from the environment variables",
+      );
+    }
+
+    this.brandName = BRAND_NAME;
+    this.senderEmail = SENDER_EMAIL;
+    this.sender = SENDER;
+    this.resend = new Resend(apiKey);
   }
 
-  async sendEmail(mailOption) {
-    const { data, error } = await this.resend.emails.send(mailOption);
+  async sendEmail(mailOption = {}) {
+    const recipients = Array.isArray(mailOption.to)
+      ? mailOption.to
+      : [mailOption.to];
+
+    const cleanedRecipients = recipients
+      .filter(Boolean)
+      .map((email) => String(email).trim());
+
+    if (
+      cleanedRecipients.length === 0 ||
+      cleanedRecipients.some((email) => !isValidEmail(email))
+    ) {
+      throw new Error("A valid recipient email address is required");
+    }
+
+    /*
+     * مقدار from اینجا به‌صورت اجباری تنظیم می‌شود.
+     * در نتیجه هیچ‌کدام از متدها نمی‌توانند مقدار from
+     * را undefined یا نامعتبر ارسال کنند.
+     */
+    const finalMailOption = {
+      ...mailOption,
+      from: SENDER,
+      to: Array.isArray(mailOption.to)
+        ? cleanedRecipients
+        : cleanedRecipients[0],
+    };
+
+    console.log("Sending email from:", JSON.stringify(finalMailOption.from));
+
+    console.log("Sending email to:", JSON.stringify(finalMailOption.to));
+
+    const { data, error } = await this.resend.emails.send(finalMailOption);
 
     if (error) {
-      throw error;
+      console.error("Resend API error:", error);
+
+      const resendError = new Error(error.message || "Resend API error");
+
+      resendError.statusCode = error.statusCode;
+      resendError.name = error.name || "ResendError";
+
+      throw resendError;
     }
 
     return data;
@@ -22,7 +81,6 @@ class EmailService {
 
   async sendVerificationCode(email, code) {
     const mailOption = {
-      from: this.sender,
       to: email,
       subject: `${this.brandName} — Your verification code`,
       html: `
@@ -72,14 +130,13 @@ class EmailService {
 
       return {
         success: false,
-        message: error?.message || "Failed to send email",
+        message: error.message || "Failed to send email",
       };
     }
   }
 
   async sendPasswordResetEmail(email, resetLink, userName = "") {
     const mailOption = {
-      from: this.sender,
       to: email,
       subject: `${this.brandName} — Reset your password`,
       html: `
@@ -116,7 +173,9 @@ class EmailService {
             </a>
           </div>
 
-          <p>Or copy and paste this link into your browser:</p>
+          <p>
+            Or copy and paste this link into your browser:
+          </p>
 
           <p style="background:#f5f5f5;padding:10px;word-break:break-all;font-size:12px;">
             ${resetLink}
@@ -155,33 +214,39 @@ class EmailService {
 
       return {
         success: false,
-        message: error?.message || "Failed to send reset email",
+        message: error.message || "Failed to send reset email",
       };
     }
   }
 
-  async sendOrderConfirmationEmail(orderDetails) {
-    const {
-      customerEmail,
-      customerName,
-      orderId,
-      orderDate,
-      items = [],
-      totalAmount,
-      shippingAddress = {},
-      paymentMethod,
-    } = orderDetails;
+  createOrderItemsRows(items = []) {
+    if (!Array.isArray(items) || items.length === 0) {
+      return `
+        <tr>
+          <td
+            colspan="6"
+            style="padding:20px;text-align:center;color:#888;"
+          >
+            No items found
+          </td>
+        </tr>
+      `;
+    }
 
-    const itemsList = items
+    return items
       .map((item) => {
-        const price = Number(item.price) || 0;
+        const price = toNumber(item.price);
 
         const discountPrice =
-          item.discount_price !== null && item.discount_price !== undefined
-            ? Number(item.discount_price)
+          item.discount_price !== null &&
+          item.discount_price !== undefined &&
+          item.discount_price !== ""
+            ? toNumber(item.discount_price, price)
             : price;
 
-        const quantity = Number(item.quantity) || 1;
+        const quantity = Math.max(1, toNumber(item.quantity, 1));
+
+        const total = discountPrice * quantity;
 
         return `
           <tr style="border-bottom:1px solid #eee;">
@@ -206,15 +271,32 @@ class EmailService {
             </td>
 
             <td style="padding:10px;text-align:right;">
-              ${(discountPrice * quantity).toFixed(2)} AED
+              ${total.toFixed(2)} AED
             </td>
           </tr>
         `;
       })
       .join("");
+  }
+
+  async sendOrderConfirmationEmail(orderDetails = {}) {
+    const {
+      customerEmail,
+      customerName,
+      orderId,
+      orderDate,
+      items = [],
+      totalAmount,
+      paymentMethod,
+    } = orderDetails;
+
+    const shippingAddress = orderDetails.shippingAddress || {};
+
+    const itemsList = this.createOrderItemsRows(items);
+
+    const finalTotalAmount = toNumber(totalAmount).toFixed(2);
 
     const mailOption = {
-      from: this.sender,
       to: customerEmail,
       subject: `${this.brandName} — Order #${orderId} confirmed`,
       html: `
@@ -239,30 +321,37 @@ class EmailService {
             </h2>
 
             <p>
-              Dear <strong>${customerName || "Customer"}</strong>,
+              Dear
+              <strong>${customerName || "Customer"}</strong>,
             </p>
 
             <p>
-              Your order has been successfully placed and is being processed.
+              Your order has been successfully placed
+              and is being processed.
             </p>
 
             <div style="background:#f0f0f0;padding:15px;border-radius:5px;margin:15px 0;">
               <p style="margin:5px 0;">
-                <strong>Order Number:</strong> #${orderId}
+                <strong>Order Number:</strong>
+                #${orderId || "-"}
               </p>
 
               <p style="margin:5px 0;">
-                <strong>Order Date:</strong> ${orderDate || "-"}
+                <strong>Order Date:</strong>
+                ${orderDate || "-"}
               </p>
 
               <p style="margin:5px 0;">
-                <strong>Payment Method:</strong> ${paymentMethod || "-"}
+                <strong>Payment Method:</strong>
+                ${paymentMethod || "-"}
               </p>
             </div>
           </div>
 
           <div style="background:white;padding:20px;border-radius:8px;margin-bottom:20px;overflow-x:auto;">
-            <h3 style="margin-top:0;">Order Summary</h3>
+            <h3 style="margin-top:0;">
+              Order Summary
+            </h3>
 
             <table style="width:100%;border-collapse:collapse;min-width:650px;">
               <thead>
@@ -307,7 +396,7 @@ class EmailService {
                   </td>
 
                   <td style="padding:10px;text-align:right;font-weight:bold;color:#4CAF50;">
-                    ${(Number(totalAmount) || 0).toFixed(2)} AED
+                    ${finalTotalAmount} AED
                   </td>
                 </tr>
               </tfoot>
@@ -315,7 +404,9 @@ class EmailService {
           </div>
 
           <div style="background:white;padding:20px;border-radius:8px;margin-bottom:20px;">
-            <h3 style="margin-top:0;">Shipping Address</h3>
+            <h3 style="margin-top:0;">
+              Shipping Address
+            </h3>
 
             <p style="margin:5px 0;">
               ${shippingAddress.full_name || "-"}
@@ -335,7 +426,8 @@ class EmailService {
             </p>
 
             <p style="margin:5px 0;">
-              Postal Code: ${shippingAddress.postal_code || "-"}
+              Postal Code:
+              ${shippingAddress.postal_code || "-"}
             </p>
           </div>
 
@@ -348,9 +440,11 @@ class EmailService {
           <hr style="margin:20px 0;">
 
           <p style="color:#888;font-size:12px;text-align:center;">
-            Need help? Reply to this email and our client-care team will assist you.
+            Need help? Reply to this email and our
+            client-care team will assist you.
             <br>
-            © ${new Date().getFullYear()} ${this.brandName}. All rights reserved.
+            © ${new Date().getFullYear()}
+            ${this.brandName}. All rights reserved.
           </p>
         </div>
       `,
@@ -371,12 +465,12 @@ class EmailService {
 
       return {
         success: false,
-        message: error?.message || "Failed to send order confirmation",
+        message: error.message || "Failed to send order confirmation",
       };
     }
   }
 
-  async sendNewOrderNotificationToWorker(orderDetails) {
+  async sendNewOrderNotificationToWorker(orderDetails = {}) {
     const {
       customerName,
       customerEmail,
@@ -384,55 +478,18 @@ class EmailService {
       orderDate,
       items = [],
       totalAmount,
-      shippingAddress = {},
       paymentMethod,
     } = orderDetails;
 
-    const itemsList = items
-      .map((item) => {
-        const price = Number(item.price) || 0;
+    const shippingAddress = orderDetails.shippingAddress || {};
 
-        const discountPrice =
-          item.discount_price !== null && item.discount_price !== undefined
-            ? Number(item.discount_price)
-            : price;
+    const itemsList = this.createOrderItemsRows(items);
 
-        const quantity = Number(item.quantity) || 1;
+    const finalTotalAmount = toNumber(totalAmount).toFixed(2);
 
-        return `
-          <tr style="border-bottom:1px solid #eee;">
-            <td style="padding:10px;text-align:left;">
-              ${item.name || "-"}
-            </td>
-
-            <td style="padding:10px;text-align:center;">
-              ${quantity}
-            </td>
-
-            <td style="padding:10px;text-align:center;">
-              ${item.size || "-"}
-            </td>
-
-            <td style="padding:10px;text-align:right;text-decoration:line-through;">
-              ${price.toFixed(2)} AED
-            </td>
-
-            <td style="padding:10px;text-align:right;">
-              ${discountPrice.toFixed(2)} AED
-            </td>
-
-            <td style="padding:10px;text-align:right;">
-              ${(discountPrice * quantity).toFixed(2)} AED
-            </td>
-          </tr>
-        `;
-      })
-      .join("");
-
-    const adminEmail = process.env.ADMIN_EMAIL || this.senderEmail;
+    const adminEmail = (process.env.ADMIN_EMAIL || this.senderEmail).trim();
 
     const mailOption = {
-      from: this.sender,
       to: adminEmail,
       subject: `${this.brandName} admin — New order #${orderId}`,
       html: `
@@ -468,7 +525,7 @@ class EmailService {
 
             <p>
               <strong>Order Number:</strong>
-              #${orderId}
+              #${orderId || "-"}
             </p>
 
             <p>
@@ -483,7 +540,9 @@ class EmailService {
           </div>
 
           <div style="background:white;padding:20px;border-radius:8px;margin-bottom:20px;overflow-x:auto;">
-            <h3 style="margin-top:0;">Order Items</h3>
+            <h3 style="margin-top:0;">
+              Order Items
+            </h3>
 
             <table style="width:100%;border-collapse:collapse;min-width:650px;">
               <thead>
@@ -528,7 +587,7 @@ class EmailService {
                   </td>
 
                   <td style="padding:10px;text-align:right;font-weight:bold;color:#ff9800;font-size:18px;">
-                    ${(Number(totalAmount) || 0).toFixed(2)} AED
+                    ${finalTotalAmount} AED
                   </td>
                 </tr>
               </tfoot>
@@ -536,7 +595,9 @@ class EmailService {
           </div>
 
           <div style="background:white;padding:20px;border-radius:8px;margin-bottom:20px;">
-            <h3 style="margin-top:0;">Shipping Address</h3>
+            <h3 style="margin-top:0;">
+              Shipping Address
+            </h3>
 
             <p style="margin:5px 0;">
               <strong>Recipient:</strong>
@@ -568,7 +629,8 @@ class EmailService {
           <div style="background:#ffebcc;padding:15px;border-radius:8px;text-align:center;">
             <p style="margin:0;">
               <strong>⚠️ Action Required:</strong>
-              Please process this order and prepare for shipment.
+              Please process this order and prepare
+              for shipment.
             </p>
 
             <p style="margin:5px 0 0;">
@@ -579,7 +641,8 @@ class EmailService {
           <hr style="margin:20px 0;">
 
           <p style="color:#888;font-size:12px;text-align:center;">
-            This is an automated notification from ${this.brandName}.
+            This is an automated notification from
+            ${this.brandName}.
             <br>
             Please process this order as soon as possible.
           </p>
@@ -602,12 +665,12 @@ class EmailService {
 
       return {
         success: false,
-        message: error?.message || "Failed to send admin notification",
+        message: error.message || "Failed to send admin notification",
       };
     }
   }
 
-  async sendOrderNotifications(orderDetails) {
+  async sendOrderNotifications(orderDetails = {}) {
     try {
       const [customerResult, workerResult] = await Promise.all([
         this.sendOrderConfirmationEmail(orderDetails),
@@ -624,7 +687,7 @@ class EmailService {
 
       return {
         success: false,
-        error: error.message,
+        error: error.message || "Failed to send order notifications",
       };
     }
   }
