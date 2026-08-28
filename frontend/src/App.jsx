@@ -85,6 +85,10 @@ function App() {
             <Route path="orders" element={<CompletedOrdersPage />} />
             <Route path="brand-upload" element={<BrandUploader />} />
             <Route path="product-upload" element={<ProductUploader />} />
+            <Route
+              path="product-upload/:productId"
+              element={<ProductUploader />}
+            />
             <Route path="banner-upload" element={<BannerUploader />} />
             <Route
               path="set-discount-prices"

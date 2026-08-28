@@ -235,17 +235,17 @@ const SingleProduct = () => {
             </div>
 
             {isAdmin && (
-              <div className="flex shrink-0 flex-nowrap items-center gap-2">
+              <div className="flex shrink-0 flex-col items-stretch gap-2">
                 <Link
                   to={`/admin/dashboard/editProduct/${getId(product)}`}
-                  className="whitespace-nowrap rounded-full border border-gray-300 px-4 py-2 text-xs font-medium uppercase tracking-widest text-gray-700 transition hover:bg-black hover:text-white"
+                  className="whitespace-nowrap rounded-full border border-gray-300 px-4 py-2 text-center text-xs font-medium uppercase tracking-widest text-gray-700 transition hover:bg-black hover:text-white"
                 >
                   Edit
                 </Link>
 
                 <Link
                   to={`/admin/dashboard/product-upload/${getId(product)}`}
-                  className="whitespace-nowrap rounded-full border border-gray-300 px-4 py-2 text-xs font-medium uppercase tracking-widest text-gray-700 transition hover:bg-black hover:text-white"
+                  className="whitespace-nowrap rounded-full border border-gray-300 px-4 py-2 text-center text-xs font-medium uppercase tracking-widest text-gray-700 transition hover:bg-black hover:text-white"
                 >
                   Add color
                 </Link>

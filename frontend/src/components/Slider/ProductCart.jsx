@@ -9,7 +9,9 @@ import { Link, useSearchParams } from "react-router-dom";
 
 const IMAGE_ROOT = "/api/images/posts/";
 
-const getProductImage = (image, size = 960) => {
+const getProductImage = (product, index = 0, size = 640) => {
+  const image = product?.images?.[index];
+
   if (!image) return "";
 
   const imageName = typeof image === "string" ? image : image.image_name;
@@ -18,7 +20,7 @@ const getProductImage = (image, size = 960) => {
 
   const hasResponsiveVersions = /-(320|640|960)\.webp$/i.test(imageName);
 
-  // اگر نسخه‌های مختلف ندارد، عکس اصلی
+  // اگر نسخه‌های مختلف ندارد، خود عکس اصلی
   if (!hasResponsiveVersions) {
     return `${IMG_URL}${imageName}`;
   }
