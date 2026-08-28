@@ -22,14 +22,14 @@ const getProductImage = (product, index = 0, size = 640) => {
 
   // اگر نسخه‌های مختلف ندارد، خود عکس اصلی
   if (!hasResponsiveVersions) {
-    return `${IMG_URL}${imageName}`;
+    return `${IMAGE_ROOT}${imageName}`;
   }
 
   const baseName = imageName
     .replace(/\.[^/.]+$/, "")
     .replace(/-(320|640|960)$/i, "");
 
-  return `${IMG_URL}${baseName}-${size}.webp`;
+  return `${IMAGE_ROOT}${baseName}-${size}.webp`;
 };
 
 const ProductCard = ({
