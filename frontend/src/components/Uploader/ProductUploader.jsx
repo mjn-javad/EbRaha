@@ -97,8 +97,7 @@ const ProductUploader = () => {
         setForm({
           type: product.type || "",
 
-          brand:
-            product.brand?.slug || product.brand_slug || product.brand || "",
+          brand: product.brand,
 
           model: product.model || "",
           category: product.category || "",
@@ -236,7 +235,7 @@ const ProductUploader = () => {
             required
           >
             <option value="">Select Type</option>
-            <option value="product">Product</option>
+            <option value="shoe">Shoe</option>
             <option value="belt">Belt</option>
             <option value="bag">Bag</option>
             <option value="luggage">Luggage</option>
