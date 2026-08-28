@@ -12,15 +12,22 @@ const IMAGE_ROOT = "/api/images/posts/";
 const getProductImage = (product, index = 0, size = 640) => {
   const imageName = product?.images?.[index]?.image_name;
 
-  if (!imageName) return "";
+  if (!imageName) return [];
 
-  // حذف پسوند اصلی و اندازه قبلی
   const baseName = imageName
     .replace(/\.[^/.]+$/, "")
     .replace(/-(320|640|960)$/i, "");
 
-  // نمایش نسخه WebP با اندازه موردنظر
-  return `${IMAGE_ROOT}${baseName}-${size}.webp`;
+  const sizes = [size, 960, 640, 320].filter(
+    (value, index, array) => array.indexOf(value) === index,
+  );
+
+  return [
+    ...sizes.map((imageSize) => `${IMAGE_ROOT}${baseName}-${imageSize}.webp`),
+
+    // عکس اصلی به‌عنوان آخرین گزینه
+    `${IMAGE_ROOT}${imageName}`,
+  ];
 };
 
 const ProductCard = ({

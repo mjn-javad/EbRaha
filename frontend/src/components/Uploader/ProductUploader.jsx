@@ -1,47 +1,159 @@
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+
 import apiClientProducts from "../../services/api-client_products";
 import apiClientBrand from "../../services/api-client_brand";
 
-import React, { FormEvent, useEffect, useState } from "react";
 import MessageAlert from "../Shared/MessageAlert";
 import InputField from "../Shared/InputField";
-import Button from "../Shared/Button";
+import LoadingSpinner from "../Shared/LoadingSpinner";
+
+const initialForm = {
+  type: "",
+  brand: "",
+  model: "",
+  category: "",
+  gender: "",
+  price: "",
+  discount_price: "",
+  description: "",
+  colors: "",
+};
 
 const ProductUploader = () => {
-  const [form, setForm] = useState({
-    type: "",
-    brand: "",
-    model: "",
-    category: "",
-    gender: "",
-    price: "",
-    discount_price: "",
-    description: "",
-    colors: "",
-  });
+  /*
+   * این productId آیدی محصول قبلی است که کاربر
+   * از صفحه آن روی Add color کلیک کرده است.
+   */
+  const { productId } = useParams();
 
-  const [brands, setBrand] = useState([]);
+  const navigate = useNavigate();
+
+  const [form, setForm] = useState(initialForm);
+  const [brands, setBrands] = useState([]);
   const [files, setFiles] = useState([]);
-  const [message, setMessage] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
 
+  const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
+  const [isLoading, setIsLoading] = useState(false);
+  const [isProductLoading, setIsProductLoading] = useState(false);
+
+  /*
+   * دریافت لیست برندها
+   */
   useEffect(() => {
-    apiClientBrand
-      .get("")
-      .then((res) => setBrand(res.data.data))
-      .catch((err) => setError(err));
+    let active = true;
+
+    const fetchBrands = async () => {
+      try {
+        const res = await apiClientBrand.get("");
+
+        if (active) {
+          setBrands(res.data?.data || []);
+        }
+      } catch (err) {
+        if (active) {
+          setError(
+            err.response?.data?.message ||
+              "There was a problem retrieving brands",
+          );
+        }
+      }
+    };
+
+    fetchBrands();
+
+    return () => {
+      active = false;
+    };
   }, []);
 
+  /*
+   * اگر productId داخل URL وجود داشته باشد،
+   * اطلاعات محصول قبلی دریافت و داخل فرم قرار می‌گیرد.
+   */
+  useEffect(() => {
+    if (!productId) {
+      setForm(initialForm);
+      setFiles([]);
+      return;
+    }
+
+    let active = true;
+
+    const fetchProduct = async () => {
+      try {
+        setIsProductLoading(true);
+        setError("");
+        setMessage("");
+
+        const res = await apiClientProducts.get(`/${productId}`);
+
+        const product = res.data?.data || res.data;
+
+        if (!active || !product) return;
+
+        setForm({
+          type: product.type || "",
+
+          brand:
+            product.brand?.slug || product.brand_slug || product.brand || "",
+
+          model: product.model || "",
+          category: product.category || "",
+          gender: product.gender || "",
+          price: product.price ?? "",
+          discount_price: product.discount_price ?? "",
+          description: product.description || "",
+
+          // رنگ محصول جدید باید توسط ادمین وارد شود
+          colors: "",
+        });
+
+        // تصاویر محصول قبلی منتقل نمی‌شوند
+        setFiles([]);
+      } catch (err) {
+        if (active) {
+          setError(
+            err.response?.data?.message ||
+              "There was a problem retrieving product information",
+          );
+        }
+      } finally {
+        if (active) {
+          setIsProductLoading(false);
+        }
+      }
+    };
+
+    fetchProduct();
+
+    return () => {
+      active = false;
+    };
+  }, [productId]);
+
   const handleChange = (nameKey, value) => {
-    setForm({
-      ...form,
+    setForm((previousForm) => ({
+      ...previousForm,
       [nameKey]: value,
-    });
+    }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleFileChange = (event) => {
+    if (!event.target.files) return;
+
+    setFiles(Array.from(event.target.files));
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    if (files.length === 0) {
+      setError("Please select at least one image");
+      return;
+    }
 
     try {
       setIsLoading(true);
@@ -50,43 +162,77 @@ const ProductUploader = () => {
 
       const formData = new FormData();
 
-      Object.keys(form).forEach((key) => {
-        if (form[key]) {
-          formData.append(key, form[key]);
+      Object.entries(form).forEach(([key, value]) => {
+        if (value !== "" && value !== null && value !== undefined) {
+          formData.append(key, value);
         }
       });
 
-      for (let i = 0; i < files.length; i++) {
-        formData.append("images", files[i]);
-      }
+      files.forEach((file) => {
+        formData.append("images", file);
+      });
 
       const res = await apiClientProducts.post("/", formData);
 
-      setMessage(res.data.message);
+      // دریافت آیدی محصول جدید از پاسخ بک‌اند
+      const newProductId = res.data?.data?.productId;
+
+      // نمایش پیام موفقیت
+      setMessage(
+        res.data?.message ||
+          (productId
+            ? "New color created successfully. Redirecting..."
+            : "Product created successfully. Redirecting..."),
+      );
 
       setFiles([]);
+
+      // دو ثانیه صبر برای نمایش پیام
+      await new Promise((resolve) => {
+        setTimeout(resolve, 2000);
+      });
+
+      // انتقال به صفحه ویرایش محصول جدید
+      navigate(`/admin/dashboard/editProduct/${newProductId}`, {
+        replace: true,
+      });
     } catch (err) {
-      setError(err.response?.data?.message || "Error creating product");
+      setError(
+        err.response?.data?.message ||
+          (productId
+            ? "Error creating new product color"
+            : "Error creating product"),
+      );
     } finally {
       setIsLoading(false);
     }
   };
 
+  if (isProductLoading) {
+    return <LoadingSpinner />;
+  }
+
   return (
-    <div className="container text-center my-5">
+    <div className="container my-5 text-center">
       <form
         onSubmit={handleSubmit}
-        className="flex flex-col gap-y-4 max-w-md mx-auto"
+        className="mx-auto flex max-w-md flex-col gap-y-4"
       >
+        <h2 className="mb-2 text-xl font-semibold">
+          {productId ? "Add New Color" : "Create Product"}
+        </h2>
+
         <div>
-          <label>Type</label>
+          <label htmlFor="type">Type</label>
+
           <select
+            id="type"
             name="type"
             value={form.type}
             onChange={(event) =>
               handleChange(event.target.name, event.target.value)
             }
-            className="bg-gray-200 mx-2 rounded-sm text-sm"
+            className="mx-2 rounded-sm bg-gray-200 text-sm"
             required
           >
             <option value="">Select Type</option>
@@ -100,19 +246,25 @@ const ProductUploader = () => {
         </div>
 
         <div>
-          <label>Brand</label>
+          <label htmlFor="brand">Brand</label>
+
           <select
+            id="brand"
             name="brand"
             value={form.brand}
             onChange={(event) =>
               handleChange(event.target.name, event.target.value)
             }
-            className="bg-gray-200 mx-2 rounded-sm text-sm"
+            className="mx-2 rounded-sm bg-gray-200 text-sm"
             required
           >
             <option value="">Select Brand</option>
-            {brands.map((brand, index) => (
-              <option key={index} value={brand.slug}>
+
+            {brands.map((brand) => (
+              <option
+                key={brand.id || brand._id || brand.slug}
+                value={brand.slug}
+              >
                 {brand.name}
               </option>
             ))}
@@ -121,14 +273,16 @@ const ProductUploader = () => {
 
         {form.type === "product" && (
           <div>
-            <label>Category</label>
+            <label htmlFor="category">Category</label>
+
             <select
+              id="category"
               name="category"
               value={form.category}
               onChange={(event) =>
                 handleChange(event.target.name, event.target.value)
               }
-              className="bg-gray-200 mx-2 rounded-sm text-sm"
+              className="mx-2 rounded-sm bg-gray-200 text-sm"
               required
             >
               <option value="">Select Category</option>
@@ -146,14 +300,16 @@ const ProductUploader = () => {
         )}
 
         <div>
-          <label>Gender</label>
+          <label htmlFor="gender">Gender</label>
+
           <select
+            id="gender"
             name="gender"
             value={form.gender}
             onChange={(event) =>
               handleChange(event.target.name, event.target.value)
             }
-            className="bg-gray-200 mx-2 rounded-sm"
+            className="mx-2 rounded-sm bg-gray-200"
             required
           >
             <option value="">Select Gender</option>
@@ -167,7 +323,9 @@ const ProductUploader = () => {
           name="model"
           label="Model"
           value={form.model}
-          onChange={(e) => handleChange(e.target.name, e.target.value)}
+          onChange={(event) =>
+            handleChange(event.target.name, event.target.value)
+          }
           required={true}
           placeholder="e.g., Air Max 97, Superstar, etc."
         />
@@ -177,7 +335,9 @@ const ProductUploader = () => {
           label="Price"
           type="number"
           value={form.price}
-          onChange={(e) => handleChange(e.target.name, e.target.value)}
+          onChange={(event) =>
+            handleChange(event.target.name, event.target.value)
+          }
           required={true}
         />
 
@@ -186,50 +346,70 @@ const ProductUploader = () => {
           label="Discount Price"
           type="number"
           value={form.discount_price}
-          onChange={(e) => handleChange(e.target.name, e.target.value)}
+          onChange={(event) =>
+            handleChange(event.target.name, event.target.value)
+          }
         />
 
         <InputField
           name="colors"
-          label="Colors (comma separated)"
+          label={productId ? "New Color" : "Colors (comma separated)"}
           value={form.colors}
-          onChange={(e) => handleChange(e.target.name, e.target.value)}
-          placeholder="e.g., red, blue, black"
+          onChange={(event) =>
+            handleChange(event.target.name, event.target.value)
+          }
+          placeholder={productId ? "e.g., black" : "e.g., red, blue, black"}
+          required={Boolean(productId)}
         />
 
         <InputField
           name="description"
           label="Description"
           value={form.description}
-          onChange={(e) => handleChange(e.target.name, e.target.value)}
+          onChange={(event) =>
+            handleChange(event.target.name, event.target.value)
+          }
         />
 
         <div>
-          <label className="block mb-2">Images</label>
+          <label htmlFor="product-images" className="mb-2 block">
+            Images
+          </label>
+
           <input
+            id="product-images"
             type="file"
             multiple
             accept="image/*"
-            onChange={(event) => {
-              if (event.target.files) {
-                setFiles(Array.from(event.target.files));
-              }
-            }}
-            className="px-5 py-2 rounded-2xl bg-gray-500 hover:bg-gray-400 duration-200"
+            onChange={handleFileChange}
+            className="rounded-2xl bg-gray-500 px-5 py-2 duration-200 hover:bg-gray-400"
           />
+
           {files.length > 0 && (
-            <p className="text-sm mt-2">{files.length} file(s) selected</p>
+            <p className="mt-2 text-sm">{files.length} file(s) selected</p>
           )}
         </div>
 
         <button
           type="submit"
-          className={`px-4 py-2 ${isLoading ? "bg-gray-400" : "bg-blue-500"} text-white rounded`}
           disabled={isLoading}
+          className={`rounded px-4 py-2 text-white ${
+            isLoading
+              ? "cursor-not-allowed bg-gray-400"
+              : "bg-blue-500 hover:bg-blue-600"
+          }`}
         >
-          {isLoading ? "Creating" : "Create Product"}
+          {isLoading
+            ? message
+              ? "Redirecting..."
+              : "Creating..."
+            : productId
+              ? "Add New Color"
+              : "Create Product"}
         </button>
+
         {message && <MessageAlert message={message} type="success" />}
+
         {error && <MessageAlert message={error} type="error" />}
       </form>
     </div>

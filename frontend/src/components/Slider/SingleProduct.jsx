@@ -45,12 +45,18 @@ const SingleProduct = () => {
 
     if (!imageName) return "";
 
-    // حذف پسوند اصلی و اندازه قبلی عکس
+    // اگر عکس نسخه اندازه‌بندی‌شده ندارد، همان عکس اصلی نمایش داده شود
+    const hasResponsiveSize = /-(320|640|960)\.webp$/i.test(imageName);
+
+    if (!hasResponsiveSize) {
+      return `${IMG_URL}${imageName}`;
+    }
+
+    // حذف پسوند و اندازه قبلی
     const baseName = imageName
       .replace(/\.[^/.]+$/, "")
       .replace(/-(320|640|960)$/i, "");
 
-    // نمایش نسخه WebP با اندازه موردنظر
     return `${IMG_URL}${baseName}-${size}.webp`;
   };
 
@@ -229,12 +235,21 @@ const SingleProduct = () => {
             </div>
 
             {isAdmin && (
-              <Link
-                to={`/admin/dashboard/editProduct/${getId(product)}`}
-                className="shrink-0 rounded-full border border-gray-300 px-4 py-2 text-xs font-medium uppercase tracking-widest text-gray-700 transition hover:bg-black hover:text-white"
-              >
-                Edit
-              </Link>
+              <div className="flex shrink-0 flex-nowrap items-center gap-2">
+                <Link
+                  to={`/admin/dashboard/editProduct/${getId(product)}`}
+                  className="whitespace-nowrap rounded-full border border-gray-300 px-4 py-2 text-xs font-medium uppercase tracking-widest text-gray-700 transition hover:bg-black hover:text-white"
+                >
+                  Edit
+                </Link>
+
+                <Link
+                  to={`/admin/dashboard/product-upload/${getId(product)}`}
+                  className="whitespace-nowrap rounded-full border border-gray-300 px-4 py-2 text-xs font-medium uppercase tracking-widest text-gray-700 transition hover:bg-black hover:text-white"
+                >
+                  Add color
+                </Link>
+              </div>
             )}
           </div>
 
