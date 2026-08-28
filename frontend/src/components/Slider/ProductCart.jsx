@@ -9,25 +9,25 @@ import { Link, useSearchParams } from "react-router-dom";
 
 const IMAGE_ROOT = "/api/images/posts/";
 
-const getProductImage = (product, index = 0, size = 640) => {
-  const imageName = product?.images?.[index]?.image_name;
+const getProductImage = (image, size = 960) => {
+  if (!image) return "";
 
-  if (!imageName) return [];
+  const imageName = typeof image === "string" ? image : image.image_name;
+
+  if (!imageName) return "";
+
+  const hasResponsiveVersions = /-(320|640|960)\.webp$/i.test(imageName);
+
+  // اگر نسخه‌های مختلف ندارد، عکس اصلی
+  if (!hasResponsiveVersions) {
+    return `${IMG_URL}${imageName}`;
+  }
 
   const baseName = imageName
     .replace(/\.[^/.]+$/, "")
     .replace(/-(320|640|960)$/i, "");
 
-  const sizes = [size, 960, 640, 320].filter(
-    (value, index, array) => array.indexOf(value) === index,
-  );
-
-  return [
-    ...sizes.map((imageSize) => `${IMAGE_ROOT}${baseName}-${imageSize}.webp`),
-
-    // عکس اصلی به‌عنوان آخرین گزینه
-    `${IMAGE_ROOT}${imageName}`,
-  ];
+  return `${IMG_URL}${baseName}-${size}.webp`;
 };
 
 const ProductCard = ({
