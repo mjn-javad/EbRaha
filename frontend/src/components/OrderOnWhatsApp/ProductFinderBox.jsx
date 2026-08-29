@@ -2,7 +2,7 @@ import React from "react";
 import { ArrowUpRight, Camera, MessageCircleMore, Search } from "lucide-react";
 
 const ProductFinderBox = () => {
-  const phoneNumber = "971566425118";
+  const phoneNumber = "971525973897";
   const message =
     "Hi EbRahaStyle, I’m looking for a product. I’ll send you a photo or reference—could you help me source it?";
   const whatsappLink = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
@@ -24,8 +24,12 @@ const ProductFinderBox = () => {
           find the piece and confirm availability and price.
         </span>
         <div className="concierge-card__steps">
-          <span><Camera size={17} /> Share a reference</span>
-          <span><MessageCircleMore size={17} /> Receive a personal reply</span>
+          <span>
+            <Camera size={17} /> Share a reference
+          </span>
+          <span>
+            <MessageCircleMore size={17} /> Receive a personal reply
+          </span>
         </div>
         <a href={whatsappLink} target="_blank" rel="noreferrer">
           Start on WhatsApp <ArrowUpRight size={18} />

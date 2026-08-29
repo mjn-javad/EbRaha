@@ -6,7 +6,7 @@ const OrderOnWhatsApp = ({
   productName = "",
   productPrice = "",
   productId = "",
-  phoneNumber = "989384835369",
+  phoneNumber = "971525973897",
 }) => {
   const [currentUrl] = useState(() => window.location.href);
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);

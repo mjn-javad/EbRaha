@@ -1,23 +1,23 @@
 import React, { useState } from "react";
 import { ArrowUpRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import Woman from "../assets/LandingPage/women.webp";
-import Man from "../assets/LandingPage/men.webp";
+import Woman from "../assets/LandingPage/women.jpg";
+import Man from "../assets/LandingPage/men.jpg";
 import BrandMark from "../components/Brand/BrandMark";
 
 const collections = [
   {
     gender: "women",
     image: Woman,
-    eyebrow: "The women’s edit",
-    title: "Modern icons,\nquietly bold.",
+    eyebrow: "",
+    title: "",
     number: "01",
   },
   {
     gender: "men",
     image: Man,
-    eyebrow: "The men’s edit",
-    title: "Refined essentials,\nmade distinctive.",
+    eyebrow: "",
+    title: "",
     number: "02",
   },
 ];
@@ -56,7 +56,9 @@ function GenderLanding() {
             <span className="collection-gateway__number">{item.number}</span>
 
             <span className="collection-gateway__copy">
-              <span className="collection-gateway__eyebrow">{item.eyebrow}</span>
+              <span className="collection-gateway__eyebrow">
+                {item.eyebrow}
+              </span>
               <strong>{item.title}</strong>
               <span className="collection-gateway__enter">
                 Enter collection <ArrowUpRight size={18} />

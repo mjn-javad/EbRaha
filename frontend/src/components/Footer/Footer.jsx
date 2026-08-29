@@ -2,6 +2,7 @@ import React from "react";
 import { ArrowUpRight, Instagram, Mail, MessageCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import BrandMark from "../Brand/BrandMark";
+import { FaWhatsapp } from "react-icons/fa";
 
 const Footer = () => {
   return (
@@ -10,7 +11,7 @@ const Footer = () => {
         <div className="boutique-footer__statement">
           <p>Private sourcing service</p>
           <h2>Can’t find the piece you have in mind?</h2>
-          <a href="https://wa.me/971566425118" target="_blank" rel="noreferrer">
+          <a href="https://wa.me/971525973897" target="_blank" rel="noreferrer">
             Speak to a curator <ArrowUpRight size={18} />
           </a>
         </div>
@@ -40,8 +41,8 @@ const Footer = () => {
           <p className="boutique-footer__label">Client care</p>
           <Link to="/basket">Your bag</Link>
           <Link to="/address">Delivery details</Link>
-          <a href="https://wa.me/971566425118">WhatsApp concierge</a>
-          <a href="mailto:mohammadnorouzi308@gmail.com">Email us</a>
+          <a href="https://wa.me/971525973897">WhatsApp concierge</a>
+          <a href="mailto:karampoorhasan00@gmail.com">Email us</a>
         </div>
 
         <div>
@@ -50,7 +51,15 @@ const Footer = () => {
           <p>Daily · 10:00—22:00</p>
           <div className="boutique-footer__socials">
             <a
-              href="https://www.instagram.com/"
+              href="https://wa.me/971525973897"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="WhatsApp"
+            >
+              <FaWhatsapp size={20} />
+            </a>
+            <a
+              href="https://www.instagram.com/vip_brand_bag"
               target="_blank"
               rel="noreferrer"
               aria-label="Instagram"
@@ -58,14 +67,14 @@ const Footer = () => {
               <Instagram size={18} />
             </a>
             <a
-              href="https://wa.me/971566425118"
+              href="https://wa.me/971525973897"
               target="_blank"
               rel="noreferrer"
               aria-label="WhatsApp"
             >
               <MessageCircle size={18} />
             </a>
-            <a href="mailto:mohammadnorouzi308@gmail.com" aria-label="Email">
+            <a href="mailto:karampoorhasan00@gmail.com" aria-label="Email">
               <Mail size={18} />
             </a>
           </div>
