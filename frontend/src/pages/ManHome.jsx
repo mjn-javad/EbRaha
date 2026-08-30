@@ -6,13 +6,11 @@ import HorizentalScroll from "../components/HorizentalScroll/HorizentalScroll";
 import BigSizeGlobalSlider from "../components/Slider/BigSizeGlobalSlider";
 import ProductFinderBox from "../components/OrderOnWhatsApp/ProductFinderBox";
 import FirstBanner from "../components/Banner/FirstBanner";
-import EditorialIntro from "../components/Home/EditorialIntro";
 
 const WomenHome = () => {
   return (
     <div className="home-page">
       <FirstBanner gender={"male"} />
-      <EditorialIntro gender="male" />
       <HorizentalScroll />
 
       <GlobalSlider

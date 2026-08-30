@@ -6,14 +6,7 @@ const { date } = require("yup");
 
 exports.createProduct = async (req, res, next) => {
   try {
-    const allowedTypes = [
-      "product",
-      "belt",
-      "bag",
-      "luggage",
-      "glasses",
-      "watch",
-    ];
+    const allowedTypes = ["shoe", "belt", "bag", "luggage", "glasses", "watch"];
 
     const allowedGenders = ["male", "female", "genderless"];
 
@@ -31,7 +24,7 @@ exports.createProduct = async (req, res, next) => {
     ];
 
     const {
-      type = "product",
+      type = "shoe",
       brand,
       model,
       category,
@@ -133,8 +126,6 @@ exports.createProduct = async (req, res, next) => {
       ? `${processedModel} - ${colorsString}`
       : processedModel;
 
-    console.log(brand);
-
     const isBrandExist = await BrandPopular.findBySlug(null, brand);
 
     if (!isBrandExist) {
@@ -179,7 +170,6 @@ exports.createProduct = async (req, res, next) => {
     if (imageNames.length > 0) {
       await ProductRepository.addImages(productId, imageNames);
     }
-
     return res.status(201).json({
       success: true,
       message: "Product created successfully",
