@@ -8,7 +8,6 @@ exports.createProduct = async (req, res, next) => {
   try {
     const allowedTypes = [
       "shoe",
-      "belt",
       "bag",
       "luggage",
       "glasses",

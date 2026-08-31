@@ -10,7 +10,6 @@ const typeLabels = {
   luggage: "Luggage",
   clothes: "Clothes",
   accessories: "Accessories",
-  belt: "Belts",
   watch: "Watches",
 };
 
@@ -157,7 +156,10 @@ const BrandsByType = () => {
                     alt={`${brand.name} logo`}
                   />
                 ) : (
-                  <span className="brand-selection__initials" aria-hidden="true">
+                  <span
+                    className="brand-selection__initials"
+                    aria-hidden="true"
+                  >
                     {getBrandInitials(brand.name)}
                   </span>
                 )}

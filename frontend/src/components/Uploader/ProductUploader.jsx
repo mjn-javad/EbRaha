@@ -236,7 +236,6 @@ const ProductUploader = () => {
           >
             <option value="">Select Type</option>
             <option value="shoe">Shoe</option>
-            <option value="belt">Belt</option>
             <option value="bag">Bag</option>
             <option value="luggage">Luggage</option>
             <option value="glasses">Glasses</option>
