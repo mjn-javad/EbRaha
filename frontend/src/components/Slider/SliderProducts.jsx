@@ -9,6 +9,8 @@ const typeLabels = {
   watch: "Watches",
   luggage: "Luggage",
   belt: "Belts",
+  clothes: "Clothes",
+  accessories: "Accessories",
 };
 
 const categoryLabels = {

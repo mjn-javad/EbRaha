@@ -95,6 +95,35 @@ exports.getAllBrand = async (req, res, next) => {
   }
 };
 
+exports.getBrandsByProductType = async (req, res, next) => {
+  try {
+    const type =
+      typeof req.query.type === "string"
+        ? req.query.type.trim().toLowerCase()
+        : "";
+    const gender =
+      typeof req.query.gender === "string"
+        ? req.query.gender.trim().toLowerCase()
+        : "";
+
+    if (!type) {
+      return res.status(400).json({
+        success: false,
+        message: "Product type is required",
+      });
+    }
+
+    const brands = await BrandPopular.getBrandsByProductType(null, {
+      type,
+      gender,
+    });
+
+    return res.status(200).json({ success: true, data: brands });
+  } catch (err) {
+    next(err);
+  }
+};
+
 exports.getBrandById = async (req, res, next) => {
   try {
     const brand = await BrandPopular.findById(null, req.params.id);

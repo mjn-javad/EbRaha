@@ -51,6 +51,8 @@ router.delete(
   controller.removeProductFromNewArrivel,
 );
 
+router.get("/by-product-type", controller.getBrandsByProductType);
+
 router.get("/:id", controller.getBrandById);
 
 router.put(

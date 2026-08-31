@@ -6,7 +6,16 @@ const { date } = require("yup");
 
 exports.createProduct = async (req, res, next) => {
   try {
-    const allowedTypes = ["shoe", "belt", "bag", "luggage", "glasses", "watch"];
+    const allowedTypes = [
+      "shoe",
+      "belt",
+      "bag",
+      "luggage",
+      "glasses",
+      "watch",
+      "clothes",
+      "accessories",
+    ];
 
     const allowedGenders = ["male", "female", "genderless"];
 

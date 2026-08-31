@@ -103,6 +103,8 @@ const ProductInfoForm = ({ productInfo, onChange, onUpdate, updating }) => {
             <option value="luggage">Luggage</option>
             <option value="glasses">Glasses</option>
             <option value="watch">Watch</option>
+            <option value="clothes">Clothes</option>
+            <option value="accessories">Accessories</option>
           </select>
         </div>
 

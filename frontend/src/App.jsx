@@ -41,6 +41,7 @@ import GenderLanding from "./pages/GenderLanding";
 import AdminLayout from "./components/Admin/AdminLayout";
 import BrandManager from "./components/Brand/BrandManager";
 import EditBrand from "./components/Brand/EditBrand";
+import BrandsByType from "./pages/BrandsByType";
 
 function App() {
   return (
@@ -57,6 +58,7 @@ function App() {
           {/* Product Pages */}
           <Route path="product/:id" element={<SingleProduct />} />
           <Route path="slider-products" element={<SliderProducts />} />
+          <Route path="brands-by-type" element={<BrandsByType />} />
           <Route path="new-arrivals" element={<SliderNewArrivels />} />
           <Route path="bestSellers" element={<BestSellersGlobalSlider />} />
 

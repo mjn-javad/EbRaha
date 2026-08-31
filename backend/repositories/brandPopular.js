@@ -33,6 +33,39 @@ const getAllBrands = async (connection) => {
   return rows;
 };
 
+const getBrandsByProductType = async (connection, { type, gender }) => {
+  const executor = getExecutor(connection);
+  const conditions = ["p.type = ?"];
+  const values = [type];
+
+  if (gender === "male" || gender === "female") {
+    conditions.push("(p.gender = ? OR p.gender = 'genderless')");
+    values.push(gender);
+  } else if (gender) {
+    conditions.push("p.gender = ?");
+    values.push(gender);
+  }
+
+  const [rows] = await executor.execute(
+    `
+      SELECT
+        b.id,
+        b.name,
+        b.slug,
+        b.image,
+        COUNT(DISTINCT p.id) AS product_count
+      FROM brands b
+      INNER JOIN products p ON p.brand = b.slug
+      WHERE ${conditions.join(" AND ")}
+      GROUP BY b.id, b.name, b.slug, b.image
+      ORDER BY b.name ASC, b.id ASC
+    `,
+    values,
+  );
+
+  return rows;
+};
+
 // ایجاد برند یا دسته‌بندی جدید
 const create = async (connection, categoryData) => {
   const executor = getExecutor(connection);
@@ -82,6 +115,7 @@ module.exports = {
   findBySlug,
   create,
   getAllBrands,
+  getBrandsByProductType,
   update,
   updateProductBrandReferences,
 };
