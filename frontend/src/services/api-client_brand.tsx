@@ -1,9 +1,10 @@
 import axios from "axios";
 
 export interface Brand {
+  id: number;
   name: string;
   slug: string;
-  image: string;
+  image: string | null;
 }
 
 const apiClientBrand = axios.create({

@@ -39,6 +39,8 @@ import EditBanner from "./components/Banner/EditBanner";
 import BestSellersGlobalSlider from "./components/Slider/BestSellersGlobalSlider";
 import GenderLanding from "./pages/GenderLanding";
 import AdminLayout from "./components/Admin/AdminLayout";
+import BrandManager from "./components/Brand/BrandManager";
+import EditBrand from "./components/Brand/EditBrand";
 
 function App() {
   return (
@@ -84,6 +86,8 @@ function App() {
             <Route path="carts" element={<SimpleAllCarts />} />
             <Route path="orders" element={<CompletedOrdersPage />} />
             <Route path="brand-upload" element={<BrandUploader />} />
+            <Route path="brands" element={<BrandManager />} />
+            <Route path="editBrand/:id" element={<EditBrand />} />
             <Route path="product-upload" element={<ProductUploader />} />
             <Route
               path="product-upload/:productId"

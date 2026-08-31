@@ -2,38 +2,86 @@ const BrandPopular = require("../repositories/brandPopular");
 const ProductsRepository = require("../repositories/products");
 const BestSellers = require("../repositories/bestSellers");
 const NewArrivels = require("../repositories/newArrivels");
+const db = require("../db");
+const fs = require("fs/promises");
+const path = require("path");
+const { createBrandSlug } = require("../utils/brandSlug");
+
+const brandImagesDirectory = path.resolve(
+  __dirname,
+  "../public/images/barnds",
+);
+
+const removeImage = async (imagePath) => {
+  if (!imagePath) return;
+
+  try {
+    await fs.unlink(imagePath);
+  } catch (error) {
+    if (error.code !== "ENOENT") {
+      console.error("Could not remove unused brand image:", error);
+    }
+  }
+};
+
+const removeStoredBrandImage = async (imageName) => {
+  if (!imageName) return;
+
+  await removeImage(path.join(brandImagesDirectory, path.basename(imageName)));
+};
+
+const isDuplicateEntryError = (error) => error?.code === "ER_DUP_ENTRY";
 
 exports.createBrand = async (req, res, next) => {
   try {
-    const { name, slug } = req.body;
+    const name = typeof req.body.name === "string" ? req.body.name.trim() : "";
+
+    if (!name) {
+      await removeImage(req.file?.path);
+      return res.status(400).json({
+        success: false,
+        message: "Brand name is required",
+      });
+    }
+
+    const slug = createBrandSlug(name);
 
     const isBrandExist = await BrandPopular.findBySlug(null, slug);
 
     if (isBrandExist) {
-      return res
-        .status(403)
-        .json({ success: false, message: "This brand Exist with this slug" });
+      await removeImage(req.file?.path);
+      return res.status(409).json({
+        success: false,
+        message: "A brand with this name already exists",
+      });
     }
 
-    let imageName = null;
-    if (req.file) {
-      imageName = req.file.filename;
-    }
-
-    const categoryData = {
-      name: name || null,
-      slug: slug || null,
-      image: imageName,
+    const brandData = {
+      name,
+      slug,
+      image: req.file?.filename || null,
     };
 
-    await BrandPopular.create(null, categoryData);
+    const brandId = await BrandPopular.create(null, brandData);
 
     return res.status(201).json({
       success: true,
       message: "Brand created successfully",
-      data: categoryData,
+      data: {
+        id: brandId,
+        ...brandData,
+      },
     });
   } catch (err) {
+    await removeImage(req.file?.path);
+
+    if (isDuplicateEntryError(err)) {
+      return res.status(409).json({
+        success: false,
+        message: "A brand with this name already exists",
+      });
+    }
+
     next(err);
   }
 };
@@ -41,9 +89,122 @@ exports.createBrand = async (req, res, next) => {
 exports.getAllBrand = async (req, res, next) => {
   try {
     const brands = await BrandPopular.getAllBrands(null);
-    return res.status(201).json({ success: true, data: brands });
+    return res.status(200).json({ success: true, data: brands });
   } catch (err) {
     next(err);
+  }
+};
+
+exports.getBrandById = async (req, res, next) => {
+  try {
+    const brand = await BrandPopular.findById(null, req.params.id);
+
+    if (!brand) {
+      return res.status(404).json({
+        success: false,
+        message: "Brand not found",
+      });
+    }
+
+    return res.status(200).json({ success: true, data: brand });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.updateBrand = async (req, res, next) => {
+  let connection;
+  let transactionCommitted = false;
+
+  try {
+    const name = typeof req.body.name === "string" ? req.body.name.trim() : "";
+
+    if (!name) {
+      await removeImage(req.file?.path);
+      return res.status(400).json({
+        success: false,
+        message: "Brand name is required",
+      });
+    }
+
+    const currentBrand = await BrandPopular.findById(null, req.params.id);
+
+    if (!currentBrand) {
+      await removeImage(req.file?.path);
+      return res.status(404).json({
+        success: false,
+        message: "Brand not found",
+      });
+    }
+
+    const slug = createBrandSlug(name);
+    const brandWithSameSlug = await BrandPopular.findBySlug(null, slug);
+
+    if (
+      brandWithSameSlug &&
+      String(brandWithSameSlug.id) !== String(currentBrand.id)
+    ) {
+      await removeImage(req.file?.path);
+      return res.status(409).json({
+        success: false,
+        message: "A brand with this name already exists",
+      });
+    }
+
+    const image = req.file?.filename || currentBrand.image || null;
+
+    connection = await db.getConnection();
+    await connection.beginTransaction();
+
+    await BrandPopular.update(connection, currentBrand.id, {
+      name,
+      slug,
+      image,
+    });
+    await BrandPopular.updateProductBrandReferences(
+      connection,
+      currentBrand.slug,
+      slug,
+    );
+
+    await connection.commit();
+    transactionCommitted = true;
+
+    if (req.file && currentBrand.image !== image) {
+      await removeStoredBrandImage(currentBrand.image);
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Brand updated successfully",
+      data: {
+        ...currentBrand,
+        name,
+        slug,
+        image,
+      },
+    });
+  } catch (err) {
+    if (connection && !transactionCommitted) {
+      await connection.rollback();
+    }
+
+    if (!transactionCommitted) {
+      await removeImage(req.file?.path);
+    }
+
+    if (isDuplicateEntryError(err)) {
+      return res.status(409).json({
+        success: false,
+        message: "A brand with this name already exists",
+      });
+    }
+
+    next(err);
+  } finally {
+    if (connection) {
+      connection.release();
+    }
   }
 };
 

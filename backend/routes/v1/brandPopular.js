@@ -51,4 +51,14 @@ router.delete(
   controller.removeProductFromNewArrivel,
 );
 
+router.get("/:id", controller.getBrandById);
+
+router.put(
+  "/:id",
+  authMiddleware,
+  isAdminMiddleware,
+  upload.single("image"),
+  controller.updateBrand,
+);
+
 module.exports = router;

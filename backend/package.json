@@ -4,7 +4,8 @@
   "main": "index.js",
   "scripts": {
     "migrate": "node ./migrations/index.js",
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "test": "node --test"
   },
   "author": "",
   "license": "ISC",

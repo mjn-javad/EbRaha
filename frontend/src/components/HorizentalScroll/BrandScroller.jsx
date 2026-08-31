@@ -2,18 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import apiClientBrand from "../../services/api-client";
-
-const formatBrand = (name) =>
-  String(name || "")
-    .trim()
-    .split(/\s+/)
-    .map((word, index) => {
-      const clean = word.replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
-      return index === 0
-        ? clean
-        : clean.charAt(0).toUpperCase() + clean.slice(1);
-    })
-    .join("");
+import { createBrandSlug } from "../../utils/createBrandSlug";
 
 const BrandScroller = ({
   brands: receivedBrands,
@@ -59,7 +48,7 @@ const BrandScroller = ({
     const params = new URLSearchParams(search);
     params.set("gender", gender);
     if (defaultType && !params.get("type")) params.set("type", defaultType);
-    params.set("brand", brand.slug || formatBrand(brand.name));
+    params.set("brand", brand.slug || createBrandSlug(brand.name));
     navigate(`${navigatePath}?${params.toString()}`);
   };
 

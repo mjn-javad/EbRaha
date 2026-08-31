@@ -49,6 +49,11 @@ const navigation = [
         icon: PackagePlus,
       },
       {
+        title: "Brands",
+        to: "/admin/dashboard/brands",
+        icon: Boxes,
+      },
+      {
         title: "New brand",
         to: "/admin/dashboard/brand-upload",
         icon: Tags,
