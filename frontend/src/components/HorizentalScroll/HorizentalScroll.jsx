@@ -5,7 +5,6 @@ import BrandScroller from "./BrandScroller";
 const HorizentalScroll = () => {
   return (
     <div className="home-curation">
-      <BrandScroller />
       <ShopByType />
     </div>
   );
