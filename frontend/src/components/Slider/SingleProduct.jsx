@@ -9,8 +9,7 @@ import MessageAlert from "../Shared/MessageAlert";
 import LoadingSpinner from "../Shared/LoadingSpinner";
 import OrderOnWhatsApp from "../OrderOnWhatsApp/OrderOnWhatsApp";
 import ProductFinderBox from "../OrderOnWhatsApp/ProductFinderBox";
-
-const IMG_URL = "/api/images/posts/";
+import { getProductImageUrl } from "../../utils/productImage";
 
 const SingleProduct = () => {
   const { id } = useParams();
@@ -38,27 +37,6 @@ const SingleProduct = () => {
   const getId = (item) => item?.id || item?._id;
 
   const isAdmin = user?.role === "admin";
-  const getImageSrc = (image, size = 960) => {
-    if (!image) return "";
-
-    const imageName = typeof image === "string" ? image : image.image_name;
-
-    if (!imageName) return "";
-
-    // اگر عکس نسخه اندازه‌بندی‌شده ندارد، همان عکس اصلی نمایش داده شود
-    const hasResponsiveSize = /-(320|640|960)\.webp$/i.test(imageName);
-
-    if (!hasResponsiveSize) {
-      return `${IMG_URL}${imageName}`;
-    }
-
-    // حذف پسوند و اندازه قبلی
-    const baseName = imageName
-      .replace(/\.[^/.]+$/, "")
-      .replace(/-(320|640|960)$/i, "");
-
-    return `${IMG_URL}${baseName}-${size}.webp`;
-  };
 
   useEffect(() => {
     let active = true;
@@ -193,7 +171,7 @@ const SingleProduct = () => {
           <div className="border rounded-lg overflow-hidden bg-gray-100 h-[450px] flex items-center justify-center">
             {images[selectedImage] ? (
               <img
-                src={getImageSrc(images[selectedImage], 960)}
+                src={getProductImageUrl(images[selectedImage], 960)}
                 alt={product.name}
                 className="w-full h-full object-contain"
               />
@@ -215,7 +193,7 @@ const SingleProduct = () => {
                   }`}
                 >
                   <img
-                    src={getImageSrc(image, 320)}
+                    src={getProductImageUrl(image, 320)}
                     alt={`${product.name} - ${index + 1}`}
                     loading="lazy"
                     className="w-full aspect-square object-cover"
@@ -299,7 +277,7 @@ const SingleProduct = () => {
                       }`}
                     >
                       <img
-                        src={getImageSrc(color?.images?.[0], 320)}
+                        src={getProductImageUrl(color?.images?.[0], 320)}
                         alt={color.name}
                         loading="lazy"
                         className="w-full h-full object-cover rounded"

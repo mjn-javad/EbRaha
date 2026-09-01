@@ -6,30 +6,10 @@ import {
   ShoppingBag,
 } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
-
-const IMAGE_ROOT = "/api/images/posts/";
+import { getProductImageUrl } from "../../utils/productImage";
 
 const getProductImage = (product, index = 0, size = 640) => {
-  const image = product?.images?.[index];
-
-  if (!image) return "";
-
-  const imageName = typeof image === "string" ? image : image.image_name;
-
-  if (!imageName) return "";
-
-  const hasResponsiveVersions = /-(320|640|960)\.webp$/i.test(imageName);
-
-  // اگر نسخه‌های مختلف ندارد، خود عکس اصلی
-  if (!hasResponsiveVersions) {
-    return `${IMAGE_ROOT}${imageName}`;
-  }
-
-  const baseName = imageName
-    .replace(/\.[^/.]+$/, "")
-    .replace(/-(320|640|960)$/i, "");
-
-  return `${IMAGE_ROOT}${baseName}-${size}.webp`;
+  return getProductImageUrl(product?.images?.[index], size);
 };
 
 const ProductCard = ({
