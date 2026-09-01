@@ -11,6 +11,7 @@ const typeLabels = {
   clothes: "Clothes",
   accessories: "Accessories",
   watch: "Watches",
+  limited_edition: "Limited Edition",
 };
 
 const getBrandImageUrl = (image) => {

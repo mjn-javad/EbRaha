@@ -24,7 +24,6 @@ const TrustFeature2 = () => (
   <section className="service-editorial">
     <div className="service-editorial__heading text-center">
       <p>The EbRaha standard</p>
-      <h2>Luxury is in the way it feels.</h2>
     </div>
     <div className="service-editorial__grid">
       {services.map(([icon, title, copy], index) => (

@@ -51,7 +51,7 @@ const BestSellersGlobalSlider = ({
       )}
 
       <ProductCard
-        poducts={poducts}
+        products={poducts}
         header={header}
         title={title}
         navigateLink={navigateLink}

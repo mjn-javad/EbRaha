@@ -10,6 +10,7 @@ const Layout = () => {
 
   const isLanding = location.pathname === "/";
   const isAdmin = location.pathname.startsWith("/admin/");
+  const isCollectionHome = ["/men", "/women"].includes(location.pathname);
 
   if (isAdmin) {
     return <Outlet />;
@@ -27,7 +28,11 @@ const Layout = () => {
     <div className="site-shell min-h-screen overflow-hidden flex flex-col">
       <NavBar />
       <TrustFeatures />
-      <main className="flex-grow w-full">
+      <main
+        className={`flex-grow w-full${
+          isCollectionHome ? " collection-home-main" : ""
+        }`}
+      >
         <Outlet />
       </main>
       <TrustFeatures2 />

@@ -104,6 +104,7 @@ const ProductInfoForm = ({ productInfo, onChange, onUpdate, updating }) => {
             <option value="watch">Watch</option>
             <option value="clothes">Clothes</option>
             <option value="accessories">Accessories</option>
+            <option value="limited_edition">Limited Edition</option>
           </select>
         </div>
 

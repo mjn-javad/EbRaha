@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { ArrowUpRight, ChevronRight } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import ImgPoductMen from "../../assets/ShopByTypePic/Men/Shoes.png";
 import ImgGlassMen from "../../assets/ShopByTypePic/Men/SunGlasses.png";
@@ -10,21 +10,13 @@ import ImgGlassWomen from "../../assets/ShopByTypePic/Women/SunGlasses.png";
 import ImgLuggWomen from "../../assets/ShopByTypePic/Women/Luggages.png";
 import ImgBagWomen from "../../assets/ShopByTypePic/Women/Bags.png";
 import ImgClothesMen from "../../assets/ShopByTypePic/Men/Clothes.webp";
-import ImgAccessoriesMen from "../../assets/ShopByTypePic/Men/Accessories.webp";
+import ImgBestSellerMen from "../../assets/ShopByTypePic/Men/BestSeller.webp";
+import ImgLimitedEditionMen from "../../assets/ShopByTypePic/Men/LimitedEdition.webp";
+import ImgWatchesMen from "../../assets/ShopByTypePic/Men/Watches.webp";
 import ImgClothesWomen from "../../assets/ShopByTypePic/Women/Clothes.webp";
-import ImgAccessoriesWomen from "../../assets/ShopByTypePic/Women/Accessories.webp";
-import ImgMobileShoesMen from "../../assets/ShopByTypePic/Men/Mobile/Shoes.webp";
-import ImgMobileBagsMen from "../../assets/ShopByTypePic/Men/Mobile/Bags.webp";
-import ImgMobileEyewearMen from "../../assets/ShopByTypePic/Men/Mobile/Eyewear.webp";
-import ImgMobileLuggageMen from "../../assets/ShopByTypePic/Men/Mobile/Luggage.webp";
-import ImgMobileClothesMen from "../../assets/ShopByTypePic/Men/Mobile/Clothes.webp";
-import ImgMobileAccessoriesMen from "../../assets/ShopByTypePic/Men/Mobile/Accessories.webp";
-import ImgMobileShoesWomen from "../../assets/ShopByTypePic/Women/Mobile/Shoes.webp";
-import ImgMobileBagsWomen from "../../assets/ShopByTypePic/Women/Mobile/Bags.webp";
-import ImgMobileEyewearWomen from "../../assets/ShopByTypePic/Women/Mobile/Eyewear.webp";
-import ImgMobileLuggageWomen from "../../assets/ShopByTypePic/Women/Mobile/Luggage.webp";
-import ImgMobileClothesWomen from "../../assets/ShopByTypePic/Women/Mobile/Clothes.webp";
-import ImgMobileAccessoriesWomen from "../../assets/ShopByTypePic/Women/Mobile/Accessories.webp";
+import ImgBestSellerWomen from "../../assets/ShopByTypePic/Women/BestSeller.webp";
+import ImgLimitedEditionWomen from "../../assets/ShopByTypePic/Women/LimitedEdition.webp";
+import ImgWatchesWomen from "../../assets/ShopByTypePic/Women/Watches.webp";
 
 const ShopByType = ({ navigatePath = "/brands-by-type" }) => {
   const navigate = useNavigate();
@@ -38,89 +30,96 @@ const ShopByType = ({ navigatePath = "/brands-by-type" }) => {
 
   const isMale = gender === "male" || gender === "men";
   const categories = [
-    [
-      "Shoes",
-      "shoe",
-      isMale ? ImgPoductMen : ImgPoductWomen,
-      isMale ? ImgMobileShoesMen : ImgMobileShoesWomen,
-      "Step into focus",
-    ],
-    [
-      "Bags",
-      "bag",
-      isMale ? ImgBagMen : ImgBagWomen,
-      isMale ? ImgMobileBagsMen : ImgMobileBagsWomen,
-      "Carry with intent",
-    ],
-    [
-      "Eyewear",
-      "glasses",
-      isMale ? ImgGlassMen : ImgGlassWomen,
-      isMale ? ImgMobileEyewearMen : ImgMobileEyewearWomen,
-      "Frame your point of view",
-    ],
-    [
-      "Luggage",
-      "luggage",
-      isMale ? ImgLuggMen : ImgLuggWomen,
-      isMale ? ImgMobileLuggageMen : ImgMobileLuggageWomen,
-      "Travel beautifully",
-    ],
-    [
-      "Clothes",
-      "clothes",
-      isMale ? ImgClothesMen : ImgClothesWomen,
-      isMale ? ImgMobileClothesMen : ImgMobileClothesWomen,
-      "Dress with distinction",
-    ],
-    [
-      "Accessories",
-      "accessories",
-      isMale ? ImgAccessoriesMen : ImgAccessoriesWomen,
-      isMale ? ImgMobileAccessoriesMen : ImgMobileAccessoriesWomen,
-      "Finish every look",
-    ],
+    {
+      title: "Bags",
+      type: "bag",
+      image: isMale ? ImgBagMen : ImgBagWomen,
+      copy: "Carry with intent",
+    },
+    {
+      title: "Shoes",
+      type: "shoe",
+      image: isMale ? ImgPoductMen : ImgPoductWomen,
+      copy: "Step into focus",
+    },
+    {
+      title: "Eyewear",
+      type: "glasses",
+      image: isMale ? ImgGlassMen : ImgGlassWomen,
+      copy: "Frame your point of view",
+    },
+    {
+      title: "Luggage",
+      type: "luggage",
+      image: isMale ? ImgLuggMen : ImgLuggWomen,
+      copy: "Travel beautifully",
+    },
+    {
+      title: "Clothes",
+      type: "clothes",
+      image: isMale ? ImgClothesMen : ImgClothesWomen,
+      copy: "Dress with distinction",
+    },
+
+    {
+      title: "Watches",
+      type: "watch",
+      image: isMale ? ImgWatchesMen : ImgWatchesWomen,
+      copy: "Make every moment count",
+    },
+    {
+      title: "Limited Edition",
+      type: "limited_edition",
+      image: isMale ? ImgLimitedEditionMen : ImgLimitedEditionWomen,
+      copy: "Explore rare pieces",
+    },
+    {
+      title: "Best Seller",
+      type: "best_seller",
+      image: isMale ? ImgBestSellerMen : ImgBestSellerWomen,
+      copy: "Discover the most wanted",
+      directPath: "/bestSellers",
+    },
   ];
 
-  const openCategory = (type) => {
+  const openCategory = ({ type, directPath }) => {
     const params = new URLSearchParams();
-    params.set("type", type);
     params.set("gender", gender);
+
+    if (directPath) {
+      navigate(`${directPath}?${params.toString()}`);
+      return;
+    }
+
+    params.set("type", type);
     navigate(`${navigatePath}?${params.toString()}`);
   };
 
   return (
-    <section className="category-edit">
-      <div className="category-edit__head">
-        <p>Shop by category</p>
-        <h2>Curated for every expression.</h2>
-      </div>
-
+    <section className="category-edit mb-0">
       <div className="category-edit__grid">
-        {categories.map(([title, type, image, mobileImage, copy], index) => (
-          <button key={type} type="button" onClick={() => openCategory(type)}>
+        {categories.map((category, index) => (
+          <button
+            key={category.type}
+            type="button"
+            onClick={() => openCategory(category)}
+          >
             <span className="category-edit__number">
               {String(index + 1).padStart(2, "0")}
             </span>
             <span className="category-edit__media">
-              <picture>
-                <source media="(max-width: 680px)" srcSet={mobileImage} />
-                <img src={image} alt={title} draggable="false" />
-              </picture>
+              <img
+                src={category.image}
+                alt={category.title}
+                draggable="false"
+              />
             </span>
             <span className="category-edit__copy">
               <span>
-                <strong>{title}</strong>
-                <small>{copy}</small>
+                <strong>{category.title}</strong>
+                <small>{category.copy}</small>
               </span>
-              <ArrowUpRight
-                className="category-edit__desktop-arrow"
-                size={19}
-              />
-              <ChevronRight
-                className="category-edit__mobile-arrow"
-                size={20}
-              />
+              <ArrowUpRight size={19} />
             </span>
           </button>
         ))}

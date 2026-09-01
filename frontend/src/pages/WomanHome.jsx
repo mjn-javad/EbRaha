@@ -12,7 +12,7 @@ const WomenHome = () => {
       <FirstBanner gender={"female"} />
       <HorizentalScroll />
 
-      <GlobalSlider
+      {/* <GlobalSlider
         myQuery={"?gender=female&sort=created_at&order=DESC&limit=12"}
         header={"New signatures"}
         title={"Just arrived"}
@@ -38,9 +38,9 @@ const WomenHome = () => {
         scrollOnLaptop={true}
       />
 
-      <GlobalBanner mobileSortOrder={7} laptopSortOrder={8} />
+      <GlobalBanner mobileSortOrder={7} laptopSortOrder={8} /> */}
 
-      <ProductFinderBox />
+      {/* <ProductFinderBox /> */}
     </div>
   );
 };

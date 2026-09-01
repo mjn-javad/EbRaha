@@ -14,6 +14,7 @@ exports.createProduct = async (req, res, next) => {
       "watch",
       "clothes",
       "accessories",
+      "limited_edition",
     ];
 
     const allowedGenders = ["male", "female", "genderless"];

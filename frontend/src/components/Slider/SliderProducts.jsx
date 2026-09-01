@@ -10,6 +10,7 @@ const typeLabels = {
   luggage: "Luggage",
   clothes: "Clothes",
   accessories: "Accessories",
+  limited_edition: "Limited Edition",
 };
 
 const categoryLabels = {
