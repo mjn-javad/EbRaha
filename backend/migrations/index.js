@@ -17,7 +17,7 @@ const migrate = async () => {
     "utf8",
   );
   const productsSizes = fs.readFileSync(
-    path.join(__dirname, "products_sizes_ddl.sql"),
+    path.join(__dirname, "products_stock_ddl.sql"),
     "utf8",
   );
   const productsImages = fs.readFileSync(

@@ -124,6 +124,7 @@ const getAllCarts = async (connection) => {
       ci.user_id,
       ci.products_id,
       ci.stock,
+      ci.stock AS size,
       ci.quantity AS cart_quantity,
 
       -- user info
@@ -209,6 +210,7 @@ const getAllOrders = async (connection) => {
           oi.id,
           oi.products_id,
           oi.stock,
+          oi.stock AS size,
           oi.quantity,
           oi.price_at_purchase,
           
@@ -279,6 +281,7 @@ const getCartByUser = async (connection, userId) => {
       ci.user_id,
       ci.products_id,
       ci.stock,
+      ci.stock AS size,
       ci.quantity as cart_quantity,
       s.name,
       s.price,
@@ -442,6 +445,7 @@ const getOrderDetailsForEmail = async (
       name: item.name,
       quantity: item.quantity,
       stock: item.stock || null,
+      size: item.stock || null,
       price: parseFloat(item.price),
       discount_price: parseFloat(item.discount_price),
       total: parseFloat(item.discount_price) * item.quantity,

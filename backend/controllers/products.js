@@ -253,11 +253,12 @@ exports.updateProductStock = async (req, res) => {
   try {
     const { productId } = req.params;
     const { size, quantity } = req.body;
+    const normalizedSize = String(size ?? req.params.size ?? "").trim();
 
-    if (!size) {
+    if (!normalizedSize || normalizedSize.length > 32) {
       return res.status(400).json({
         success: false,
-        message: "Size is required",
+        message: "Size is required and must be 32 characters or fewer",
       });
     }
 
@@ -270,7 +271,11 @@ exports.updateProductStock = async (req, res) => {
       });
     }
 
-    const updated = await changeStock(productId, size, quantityChange);
+    const updated = await changeStock(
+      productId,
+      normalizedSize,
+      quantityChange,
+    );
 
     if (!updated) {
       return res.status(404).json({
@@ -691,6 +696,10 @@ const changeStock = async (productId, size, quantityChange) => {
 
   if (!normalizedSize) {
     throw new Error("Size is required");
+  }
+
+  if (normalizedSize.length > 32) {
+    throw new Error("Size must be 32 characters or fewer");
   }
 
   if (!Number.isInteger(parsedQuantity) || parsedQuantity === 0) {

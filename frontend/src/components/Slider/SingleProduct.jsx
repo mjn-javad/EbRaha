@@ -122,7 +122,7 @@ const SingleProduct = () => {
     try {
       const res = await apiClientCart.post("/cart", {
         productsId: getId(product),
-        size: selectedSize,
+        stock: selectedSize,
         quantity,
         color: currentColor?.name || product?.color || null,
       });

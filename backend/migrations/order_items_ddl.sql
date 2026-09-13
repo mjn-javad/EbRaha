@@ -2,7 +2,7 @@ CREATE TABLE order_items (
     id INT AUTO_INCREMENT PRIMARY KEY,
     order_id INT UNSIGNED NOT NULL,
     products_id INT NOT NULL,
-    size INT NOT NULL,
+    stock VARCHAR(32) NOT NULL,
     color_code VARCHAR(255) NOT NULL,
     quantity INT NOT NULL,
     price_at_purchase DECIMAL(10,2) NOT NULL,

@@ -49,7 +49,7 @@ const addImages = async (productId, images) => {
 
 const addSize = async (productId, size, quantity) => {
   const query = `
-    INSERT INTO products_stock (products_id, size, quantity) 
+    INSERT INTO products_stock (products_id, stock, quantity)
     VALUES (?, ?, ?)
   `;
 
@@ -80,7 +80,7 @@ const increaseStock = async (productId, size, quantity) => {
   const query = `
     INSERT INTO products_stock (
       products_id,
-      size,
+      stock,
       quantity
     )
     VALUES (?, ?, ?)
@@ -331,7 +331,7 @@ const getAll = async ({
     }
 
     sizesByproduct[item.products_id].push({
-      stock: item.stock,
+      size: item.stock,
       quantity: item.quantity,
     });
   });
@@ -663,7 +663,7 @@ const updateImageSortOrder = async (productId, imageName, sortOrder) => {
 
 const changeStock = async (productId, size, quantityChange) => {
   const query = `
-    INSERT INTO products_stock (products_id, size, quantity)
+    INSERT INTO products_stock (products_id, stock, quantity)
     VALUES (?, ?, ?)
     ON DUPLICATE KEY UPDATE
       quantity = GREATEST(quantity + VALUES(quantity), 0)
@@ -675,7 +675,7 @@ const changeStock = async (productId, size, quantityChange) => {
     `
       DELETE FROM products_stock
       WHERE products_id = ?
-        AND size = ?
+        AND stock = ?
         AND quantity <= 0
     `,
     [productId, size],

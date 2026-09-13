@@ -10,9 +10,18 @@ const emailService = require("../services/emailService");
 exports.addToCart = async (req, res, next) => {
   try {
     const userId = req.user.id;
-    const { productsId, stock, quantity } = req.body;
+    const productsId = Number(req.body.productsId);
+    const quantity = Number(req.body.quantity);
+    let stock = String(req.body.stock ?? req.body.size ?? "").trim();
 
-    if (!productsId || !stock || !quantity) {
+    if (
+      !Number.isInteger(productsId) ||
+      productsId <= 0 ||
+      !stock ||
+      stock.length > 32 ||
+      !Number.isInteger(quantity) ||
+      quantity <= 0
+    ) {
       return res.status(400).json({
         success: false,
         message: "Invalid input data",
@@ -27,9 +36,23 @@ exports.addToCart = async (req, res, next) => {
       });
     }
 
-    const isThisQuantityInStock =
-      product.stocks.filter((s) => s.stock === stock)[0].quantity >= quantity;
-    if (!isThisQuantityInStock) {
+    const selectedStock = (product.sizes || product.stocks || []).find(
+      (item) =>
+        String(item.size ?? item.stock)
+          .trim()
+          .toUpperCase() === stock.toUpperCase(),
+    );
+
+    if (!selectedStock) {
+      return res.status(400).json({
+        success: false,
+        message: "Selected size is not available",
+      });
+    }
+
+    stock = String(selectedStock.size ?? selectedStock.stock).trim();
+
+    if (Number(selectedStock.quantity) < quantity) {
       return res.status(403).json({
         success: false,
         message:

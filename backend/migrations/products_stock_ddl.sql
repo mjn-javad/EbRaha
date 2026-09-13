@@ -1,7 +1,7 @@
 CREATE TABLE products_stock (
     id INT AUTO_INCREMENT PRIMARY KEY,
     products_id INT NOT NULL,
-    stock INT NOT NULL,
+    stock VARCHAR(32) NOT NULL,
     quantity INT NOT NULL DEFAULT 0,
     FOREIGN KEY (products_id) REFERENCES products(id) ON DELETE CASCADE,
     UNIQUE KEY unique_product_stock (products_id, stock)
