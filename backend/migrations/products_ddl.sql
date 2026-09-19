@@ -10,63 +10,37 @@ CREATE TABLE products (
         COMMENT 'مدل یا نام سری محصول از برند مربوطه',
 
     category ENUM(
-        'makeup',
-        'skincare',
-        'haircare',
-        'bodycare',
-        'fragrance',
-        'personal_care',
-        'beauty_tools',
+        'sneaker',
+        'loafer',
+        'formal',
+        'boot',
+        'sandal',
+        'sport',
+        'classic',
+        'heels',
+        'flat',
         'other'
     ) NOT NULL DEFAULT 'other'
-        COMMENT 'دسته‌بندی اصلی محصول',
+        COMMENT 'دسته‌بندی محصول',
 
     gender ENUM(
+        'male',
         'female',
-        'unisex'
+        'genderless'
     ) NOT NULL
-        COMMENT 'مناسب برای خانم‌ها یا استفاده عمومی',
+        COMMENT 'جنسیت هدف محصول',
 
     type ENUM(
-        'foundation',
-        'concealer',
-        'powder',
-        'blush',
-        'bronzer',
-        'highlighter',
-        'eyeshadow',
-        'eyeliner',
-        'mascara',
-        'lipstick',
-        'lip_gloss',
-        'lip_liner',
-        'makeup_remover',
-        'cleanser',
-        'toner',
-        'serum',
-        'moisturizer',
-        'face_cream',
-        'face_mask',
-        'sunscreen',
-        'shampoo',
-        'conditioner',
-        'hair_mask',
-        'hair_oil',
-        'body_lotion',
-        'body_cream',
-        'body_wash',
-        'hand_cream',
-        'scrub',
-        'perfume',
-        'body_mist',
-        'deodorant',
-        'feminine_care',
-        'makeup_brush',
-        'makeup_sponge',
-        'beauty_tool',
-        'other'
-    ) NOT NULL DEFAULT 'other'
-        COMMENT 'نوع محصول آرایشی یا بهداشتی',
+        'shoe',
+        'bag',
+        'luggage',
+        'glasses',
+        'watch',
+        'clothes',
+        'accessories',
+        'limited_edition'
+    ) NOT NULL DEFAULT 'shoe'
+        COMMENT 'نوع محصول',
 
     price DECIMAL(10,2) NOT NULL,
 
