@@ -8,7 +8,6 @@ import apiClientAuth from "../../services/api-client_auth";
 import MessageAlert from "../Shared/MessageAlert";
 import LoadingSpinner from "../Shared/LoadingSpinner";
 import OrderOnWhatsApp from "../OrderOnWhatsApp/OrderOnWhatsApp";
-import ProductFinderBox from "../OrderOnWhatsApp/ProductFinderBox";
 import { getProductImageUrl } from "../../utils/productImage";
 
 const SingleProduct = () => {
@@ -158,7 +157,6 @@ const SingleProduct = () => {
 
   return (
     <div className="product-detail container mx-auto my-0 p-4">
-      <ProductFinderBox />
       <OrderOnWhatsApp
         productName={product.name}
         productPrice={product.discount_price || product.price}

@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import apiClientBrandPopular from "../../services/api-client";
 import { useSearchParams } from "react-router-dom";
 import ProductCard from "./ProductCart";
-import ProductFinderBox from "../OrderOnWhatsApp/ProductFinderBox";
 import BrandScroller from "../HorizentalScroll/BrandScroller";
 
 const SliderBestSellers = ({ header, title, navigateLink, limit }) => {
@@ -28,7 +27,6 @@ const SliderBestSellers = ({ header, title, navigateLink, limit }) => {
 
   return (
     <div className="global-slider">
-      {limit === undefined && <ProductFinderBox />}
       <BrandScroller />
       <ProductCard
         products={products}

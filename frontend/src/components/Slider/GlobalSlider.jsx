@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import apiClientPpoducts from "../../services/api-client_products";
 import ProductCard from "./ProductCart";
-import ProductFinderBox from "../OrderOnWhatsApp/ProductFinderBox";
 import BrandScroller from "../HorizentalScroll/BrandScroller";
 
 const GlobalSlider = ({
@@ -47,8 +46,6 @@ const GlobalSlider = ({
 
   return (
     <div className="global-slider">
-      {limit === undefined && <ProductFinderBox />}
-
       {limit === undefined && <BrandScroller brands={brands} />}
 
       <ProductCard

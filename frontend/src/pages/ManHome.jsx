@@ -4,7 +4,6 @@ import GlobalSlider from "../components/Slider/GlobalSlider";
 import GlobalBanner from "../components/Banner/GlobalBanner";
 import HorizentalScroll from "../components/HorizentalScroll/HorizentalScroll";
 import BigSizeGlobalSlider from "../components/Slider/BigSizeGlobalSlider";
-import ProductFinderBox from "../components/OrderOnWhatsApp/ProductFinderBox";
 import FirstBanner from "../components/Banner/FirstBanner";
 
 const WomenHome = () => {
@@ -44,8 +43,7 @@ const WomenHome = () => {
       />
 
       <GlobalBanner mobileSortOrder={9} laptopSortOrder={10} />
-
-      <ProductFinderBox /> */}
+ */}
     </div>
   );
 };

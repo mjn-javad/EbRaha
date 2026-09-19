@@ -1133,8 +1133,10 @@ button {
   margin-top: 2.5rem;
 }
 
-.brand-edit {
-  margin-bottom: 7rem;
+.product-showcase.brand-edit {
+  width: min(100% - 3rem, 90rem);
+  margin-top: 2.5rem;
+  margin-bottom: 2.5rem;
 }
 
 .brand-edit__head,
@@ -1147,6 +1149,16 @@ button {
   border-bottom: 1px solid var(--line);
 }
 
+.brand-edit__head {
+  gap: 1rem;
+  padding-bottom: 0.65rem;
+}
+
+.brand-edit__head p {
+  margin-bottom: 0.4rem;
+  font-size: 0.55rem;
+}
+
 .brand-edit__head h2,
 .product-showcase__head h2,
 .category-edit__head h2 {
@@ -1155,6 +1167,11 @@ button {
   font-size: clamp(2rem, 3.4vw, 3.8rem);
   font-weight: 400;
   letter-spacing: -0.04em;
+}
+
+.brand-edit__head h2 {
+  font-size: clamp(1.35rem, 2vw, 1.85rem);
+  line-height: 1.05;
 }
 
 .brand-edit__head > div:last-child,
@@ -1173,6 +1190,11 @@ button {
   color: var(--ink);
 }
 
+.brand-edit__head button {
+  width: 2rem;
+  height: 2rem;
+}
+
 .brand-edit__head button + button,
 .product-showcase__arrows button + button {
   border-left: 0;
@@ -1186,8 +1208,10 @@ button {
 
 .brand-edit__rail {
   display: flex;
+  gap: 0;
   overflow-x: auto;
-  border-left: 1px solid var(--line);
+  padding: 0;
+  border-bottom: 1px solid var(--line);
   scroll-snap-type: x proximity;
   scrollbar-width: none;
 }
@@ -1200,17 +1224,20 @@ button {
 .brand-edit__rail button {
   position: relative;
   display: flex;
-  min-width: 15rem;
-  min-height: 8rem;
-  flex-direction: column;
-  justify-content: flex-end;
+  min-width: 0;
+  max-width: 14rem;
+  min-height: 0;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
   scroll-snap-align: start;
-  padding: 1.3rem;
+  overflow: hidden;
+  padding: 0.8rem 1.15rem;
   border: 0;
   border-right: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
+  border-radius: 0;
   background: transparent;
-  text-align: left;
+  text-align: center;
   transition: 250ms ease;
 }
 
@@ -1219,19 +1246,16 @@ button {
   color: white;
 }
 
-.brand-edit__rail span {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  color: var(--champagne);
-  font-family: var(--serif);
-  font-size: 0.67rem;
-}
-
 .brand-edit__rail strong {
+  display: block;
+  width: 100%;
+  overflow: hidden;
   font-family: var(--serif);
-  font-size: 1.35rem;
+  font-size: 0.98rem;
   font-weight: 400;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .brand-edit__error {
@@ -2772,7 +2796,7 @@ button {
     width: calc(100% - 2rem);
   }
 
-  .brand-edit,
+  .product-showcase.brand-edit,
   .category-edit,
   .product-showcase,
   .bestseller-editorial,
@@ -2789,12 +2813,17 @@ button {
   .product-showcase__head h2 {
     font-size: 2rem;
   }
+  .brand-edit__head h2 {
+    font-size: 1.3rem;
+  }
   .brand-edit__head > div:last-child {
     display: none;
   }
   .brand-edit__rail button {
-    min-width: 12rem;
-    min-height: 7rem;
+    min-width: 0;
+    min-height: 0;
+    flex-basis: auto;
+    padding: 0.75rem 1rem;
   }
 
   .brand-selection {

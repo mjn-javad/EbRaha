@@ -53,7 +53,13 @@ const BrandScroller = ({
   };
 
   const move = (direction) => {
-    railRef.current?.scrollBy({ left: direction * 360, behavior: "smooth" });
+    const rail = railRef.current;
+    if (!rail) return;
+
+    rail.scrollBy({
+      left: direction * Math.max(240, rail.clientWidth * 0.75),
+      behavior: "smooth",
+    });
   };
 
   if (!brands.length && !error) return null;
@@ -63,7 +69,6 @@ const BrandScroller = ({
       <div className="brand-edit__head">
         <div>
           <p>EbRaha Style</p>
-          <h2>House names & new discoveries</h2>
         </div>
         <div>
           <button
@@ -92,8 +97,8 @@ const BrandScroller = ({
               key={brand.id || brand.slug || `${brand.name}-${index}`}
               type="button"
               onClick={() => selectBrand(brand)}
+              title={brand.name}
             >
-              <span>{String(index + 1).padStart(2, "0")}</span>
               <strong>{brand.name}</strong>
             </button>
           ))}
