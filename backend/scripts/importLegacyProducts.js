@@ -249,17 +249,32 @@ function rowsToObjects(rows, columns, tableName) {
 
 function normalizeImageName(imageName) {
   const parsed = path.parse(imageName);
-  const baseName = parsed.name.replace(/-(320|640|960)$/iu, "");
-  return `${baseName}.webp`;
+  return `${parsed.name}.webp`;
+}
+
+function getImageBaseName(imageName) {
+  return path.parse(imageName).name.replace(/-(320|640|960)$/iu, "");
 }
 
 function getImageCandidates(imageName) {
-  const parsed = path.parse(imageName);
+  const baseName = getImageBaseName(imageName);
   return [
-    imageName,
-    `${parsed.name}-960.webp`,
-    `${parsed.name}-640.webp`,
-    `${parsed.name}-320.webp`,
+    `${baseName}.webp`,
+    `${baseName}-960.webp`,
+    `${baseName}-640.webp`,
+    `${baseName}-320.webp`,
+  ];
+}
+
+function getRequiredImageFiles(imageName) {
+  const hasResponsiveSuffix = /-(320|640|960)$/iu.test(path.parse(imageName).name);
+  if (!hasResponsiveSuffix) return [imageName];
+
+  const baseName = getImageBaseName(imageName);
+  return [
+    `${baseName}-320.webp`,
+    `${baseName}-640.webp`,
+    `${baseName}-960.webp`,
   ];
 }
 
@@ -325,22 +340,31 @@ function validateCatalog(catalog, imagesDir) {
   }
 
   let missingImages = [];
+  let missingFiles = [];
   if (imagesDir) {
-    missingImages = catalog.images
-      .filter(
-        (image) =>
-          !getImageCandidates(image.imageName).some((candidate) =>
-            fs.existsSync(path.join(imagesDir, candidate)),
-          ),
-      )
-      .map((image) => image.imageName);
+    const missingImageNames = new Set();
+    const missingFileNames = new Set();
 
-    if (missingImages.length > 0) {
-      warnings.push(`${missingImages.length} normalized image files are missing`);
+    for (const image of catalog.images) {
+      for (const requiredFile of getRequiredImageFiles(image.imageName)) {
+        if (!fs.existsSync(path.join(imagesDir, requiredFile))) {
+          missingImageNames.add(image.imageName);
+          missingFileNames.add(requiredFile);
+        }
+      }
+    }
+
+    missingImages = [...missingImageNames];
+    missingFiles = [...missingFileNames];
+
+    if (missingFiles.length > 0) {
+      warnings.push(
+        `${missingFiles.length} required image files are missing for ${missingImages.length} database images`,
+      );
     }
   }
 
-  return { errors, warnings, missingImages: [...new Set(missingImages)] };
+  return { errors, warnings, missingImages, missingFiles };
 }
 
 async function assertCompatibleSchema(connection) {
@@ -445,12 +469,13 @@ async function importCatalog(catalog) {
       const existingByBaseName = new Map();
 
       for (const row of existingRows) {
-        const baseName = path.parse(row.image_name).name;
+        const baseName = getImageBaseName(row.image_name);
         if (!existingByBaseName.has(baseName)) existingByBaseName.set(baseName, row);
       }
 
       for (const image of images) {
-        const existing = existingByBaseName.get(path.parse(image.imageName).name);
+        const imageBaseName = getImageBaseName(image.imageName);
+        const existing = existingByBaseName.get(imageBaseName);
         if (existing) {
           await connection.execute(
             "UPDATE products_images SET image_name = ?, sort_order = ? WHERE id = ?",
@@ -462,7 +487,7 @@ async function importCatalog(catalog) {
             "INSERT INTO products_images (products_id, image_name, sort_order) VALUES (?, ?, ?)",
             [productId, image.imageName, image.sortOrder],
           );
-          existingByBaseName.set(path.parse(image.imageName).name, {
+          existingByBaseName.set(imageBaseName, {
             id: result.insertId,
             image_name: image.imageName,
           });
@@ -513,7 +538,10 @@ async function main() {
   console.log(`Products: ${catalog.products.length}`);
   console.log(`Images:   ${catalog.images.length}`);
   console.log(`Stocks:   ${catalog.stocks.length}`);
-  if (imagesDir) console.log(`Missing normalized images: ${validation.missingImages.length}`);
+  if (imagesDir) {
+    console.log(`Images with missing files: ${validation.missingImages.length}`);
+    console.log(`Missing required image files: ${validation.missingFiles.length}`);
+  }
 
   for (const warning of validation.warnings) console.warn(`WARNING: ${warning}`);
   if (validation.errors.length > 0) {
@@ -521,7 +549,7 @@ async function main() {
   }
   if (
     options.apply &&
-    validation.missingImages.length > 0 &&
+    validation.missingFiles.length > 0 &&
     !options.allowMissingImages
   ) {
     throw new Error(
@@ -549,7 +577,9 @@ if (require.main === module) {
 module.exports = {
   detectTable,
   extractInsertBodies,
+  getImageBaseName,
   getImageCandidates,
+  getRequiredImageFiles,
   normalizeImageName,
   parseMysqlValues,
   readLegacyCatalog,
