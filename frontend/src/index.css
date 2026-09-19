@@ -2032,6 +2032,10 @@ button {
   margin-bottom: 6rem !important;
 }
 
+.product-detail {
+  margin-top: 1.25rem !important;
+}
+
 .basket-page > h1,
 .checkout-page > h1 {
   font-family: var(--serif);
@@ -2068,7 +2072,7 @@ button {
 
 .product-detail > .grid {
   gap: clamp(2rem, 5vw, 6rem);
-  margin-top: 5rem;
+  margin-top: 0;
 }
 
 .product-detail .rounded-lg {
