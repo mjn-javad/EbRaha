@@ -4,6 +4,7 @@ import GlobalSlider from "./GlobalSlider";
 
 const typeLabels = {
   product: "Products",
+  shoe: "Shoes",
   bag: "Bags",
   glasses: "Glasses",
   watch: "Watches",
@@ -98,13 +99,11 @@ const SliderProducts = ({ limit }) => {
     }
 
     if (brandLabel && type) {
-      header = genderLabel
-        ? `${genderLabel} ${brandLabel} ${typeLabel}`
-        : `${brandLabel} ${typeLabel}`;
+      header = brandLabel;
 
       title = genderLabel
-        ? `Discover luxury ${brandLabel} ${typeLabel.toLowerCase()} for ${genderLabel.toLowerCase()}`
-        : `Discover luxury ${brandLabel} ${typeLabel.toLowerCase()}`;
+        ? `${genderLabel} ${typeLabel} collection`
+        : `${typeLabel} collection`;
 
       return { header, title };
     }
@@ -144,8 +143,10 @@ const SliderProducts = ({ limit }) => {
       myQuery={myQuery}
       header={pageInfo.header}
       title={pageInfo.title}
-      navigateLink={`/slider-products${myQuery}`}
       limit={limit}
+      pagination
+      pageSize={limit || 8}
+      mobilePageSize={limit || 9}
     />
   );
 };
