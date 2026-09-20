@@ -1643,16 +1643,19 @@ button {
 .product-tile__image--alternate {
   position: absolute;
   inset: 0;
+  background: var(--paper);
+  opacity: 0;
+}
+
+.product-tile:hover
+  .product-tile__media--has-alternate
+  .product-tile__image--primary {
   opacity: 0;
 }
 
 .product-tile:hover .product-tile__image--alternate {
   opacity: 1;
   transform: scale(1.02);
-}
-
-.product-tile:hover .product-tile__image--alternate + * {
-  opacity: 1;
 }
 
 .product-tile__placeholder {

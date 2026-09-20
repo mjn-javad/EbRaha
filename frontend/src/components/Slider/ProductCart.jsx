@@ -169,14 +169,20 @@ const ProductCard = ({
               to={`/product/${productId}`}
               className="product-tile"
             >
-              <div className="product-tile__media">
+              <div
+                className={`product-tile__media${
+                  secondaryImage
+                    ? " product-tile__media--has-alternate"
+                    : ""
+                }`}
+              >
                 {primaryImage ? (
                   <>
                     <img
                       src={primaryImage}
                       alt={product.name}
                       loading="lazy"
-                      className="product-tile__image"
+                      className="product-tile__image product-tile__image--primary"
                     />
                     {secondaryImage && (
                       <img
